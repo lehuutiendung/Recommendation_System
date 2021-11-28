@@ -1,0 +1,195 @@
+#getting-started{
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+#getting-started .header{
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 18px;
+    padding-right: 40px;
+    box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+}
+
+#getting-started .header .icon-app{
+    height: 60px;
+    width: 110px;
+    background-image: url(../../../assets/logo_text.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: contain;
+    cursor: pointer;
+}
+
+/* Start: Css cho nhóm các button trên header */
+#getting-started .header .group-header{
+    display: flex;
+}
+
+.header .group-header .btn-header{
+    width: 80px;
+    margin-left: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.header .group-header .btn-header:hover{
+    height: 30px;
+    border-radius: 30px;
+    background-color: #1877F2;
+    color: #ffffff;
+    background-image: linear-gradient(144deg,#AF40FF, #1877F2 50%,#00DDEB);
+    box-sizing: border-box;
+}
+
+/* End: Css cho nhóm các button trên header */
+
+#getting-started .container{
+    display: flex;
+}
+
+#getting-started .container .left{
+    height: calc(100vh - var(--header-height));
+    width: 40%;
+    display: flex;
+    align-items: center;
+}
+
+.container .left .container-general{
+    margin: 40px;
+}
+
+.container .left .title{
+    font-size: 60px;
+    font-weight: 700;
+    color: #1877F2;
+    margin-bottom: 10px;
+}
+
+.container .left .container-general .content{
+    margin-bottom: 20px;
+    font-size: 30px;
+}
+
+.container .left .container-general .content #visonet{
+    font-style: italic;
+    font-weight: 500;
+}
+
+#getting-started .container .right{
+    height: calc(100vh - var(--header-height));
+    width: 60%;
+    background-image: url(../../../assets/getting-started.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+}
+
+/* CSS button login */
+.container .left .container-general .button-login{
+    height: 35px;
+    width: 120px;
+    background-color: #1877F2;
+    cursor: pointer;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-sizing: border-box;
+    font-size: 18px;
+    margin-right: 10px;
+}
+.container .left .container-general .button-login:hover{
+    background-color: #1467D4;
+}
+
+.container .left .container-general .ask-register{
+    color: #166FE5;
+    cursor: pointer;
+}
+
+/* Start : CSS cho box login */
+.container .left .box-login{
+    margin: 40px;
+    padding: 35px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: rgba(0, 0, 0, 0.16) 0px 10px 36px 0px, rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    border-radius: 8px;
+    width: 100%;
+    background-color: #ffffff;
+    text-align: center;
+}
+
+.container .left .box-login .success-register{
+    font-size: 20px;
+}
+
+.container .left .box-login .text-noti{
+    color: red;
+    margin-bottom: 5px;
+}
+
+.container .left .box-login .success-register .icon-success{
+    background: url(../../../assets/icon/Sprites.svg);
+    background-position: -984px -456px;
+    margin-right: 10px;
+}
+
+.container .left .box-login .input-login{
+    height: 40px;
+    padding: 14px 16px;
+    border-radius: 6px;
+    font-size: 17px;
+    border: 1px solid #d1d1d1;
+    margin-bottom: 10px;
+}
+
+.container .left .box-login .button-login{
+    height: 38px;
+    background-color: #1877F2;
+    cursor: pointer;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    box-sizing: border-box;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.container .left .box-login .button-login:hover{
+    background-color: #1467d4;
+}
+
+.container .left .box-login .ask-forget-pass{
+    color: #166FE5;
+    cursor: pointer;
+}
+/* End : CSS cho box login */
+
+@media only screen and (max-width: 660px) {
+    #getting-started{
+        overflow-y: scroll;
+        box-sizing: border-box;
+    }
+    #getting-started .container{
+        flex-direction: column;
+        
+    }
+    #getting-started .container .left{
+        width: inherit;
+        height: 40%;
+    }
+    #getting-started .container .right{
+        width: inherit;
+        height: 400px;
+    }
+}
