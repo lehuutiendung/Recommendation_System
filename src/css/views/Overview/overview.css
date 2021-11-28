@@ -1,0 +1,98 @@
+.overview{
+    background-color: var(--background-app);
+}
+.overview .header{
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 18px;
+    padding-right: 40px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dddddd;
+}
+
+.overview .header .icon-app{
+    height: 60px;
+    width: 110px;
+    background-image: url(../../../assets/logo_text.png);
+    background-repeat: no-repeat;
+    background-position: left;
+    background-size: contain;
+    cursor: pointer;
+}
+
+.overview .header .group-header{
+    display: flex;
+    align-items: center;
+}
+
+.overview .header .wrap-avatar-username{
+    border-radius: 25px;
+    height: 40px;
+    padding: 0 5px;
+    display: flex;
+    align-items: center;
+}
+
+.overview .header .wrap-avatar-username:hover{
+    background-color: #efefef;
+}
+
+.overview .header .wrap-avatar-username .avatar-username .username{
+    font-weight: 500;
+    color: #313131;
+    margin-left: 5px;
+}
+
+.overview .header .group-header .icon-avatar{
+    background: url(../../../assets/Avatar.jpg);
+    background-size: contain;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.overview .content{
+    display: flex;
+    height: calc(100vh - 72px);
+    margin-top: 16px;
+    overflow: auto;
+    justify-content: center;
+    box-sizing: border-box;
+}
+
+/* Left-bar */
+.overview .left-bar{
+    width: var(--sidebarLeft-width);
+    background-color: var(--background-app);
+    overflow: hidden;
+    overflow-y: scroll;
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    overflow: hidden;
+}
+
+/* Center */
+.overview .center{
+    width: var(--content-width);
+    margin: 0 5%;
+    font-size: 14px;
+}
+
+/* Right-bar */
+.overview .right-bar{
+    width: var(--sidebarRight-width);
+    background-color: var(--background-app);
+}
+.button-icon{
+margin-left: 10px;
+}
+.icon-message{
+    background: url(../../../assets/svg/feedback-svgrepo-com.svg);
+    background-size: contain;
+}
+.icon-notify{
+    background-image: url(../../../assets/svg/bell-alert-svgrepo-com.svg);
+    background-size: contain;
+}

@@ -1,0 +1,54 @@
+.visonet{
+    display: flex;   
+    flex-direction: column;
+    justify-content: center;
+}    
+.visonet .box-status{
+    background-color: #FFFFFF;
+    width: 100%;
+    border-radius: 12px;
+    display: flex;  
+    flex-direction: column;
+    padding: 14px;
+    border: 1px solid #dddddd;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    margin-bottom: 15px;
+}
+.box-status .wrap-content{
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dddddd;
+}
+.box-status .wrap-content .ask-content{
+    font-size: 16px;
+    margin-left: 5px;
+    color: #444649;
+    height: 100%;
+    width: 100%;
+    cursor: text;
+}
+.box-status .wrap-active{
+    margin-top: 10px;
+}
+.wrap-active .item{
+    padding: 5px 5px;
+    margin-right: 5px;
+}
+.wrap-active .item:hover{
+    background-color: #F2F7FC;
+    cursor: pointer;
+    border-radius: 4px;
+}
+.wrap-active .item .name-item{
+    font-weight: 500;
+    font-size: 15px;
+    margin-left: 5px;
+    color: #444649;
+}
+.icon-picture{
+    background: url(../../../assets/svg/picture-photo-svgrepo-com.svg);
+    background-size: contain;
+}
+.icon-emotion{
+    background: url(../../../assets/svg/emoticon.svg);
+    background-size: contain;
+}
