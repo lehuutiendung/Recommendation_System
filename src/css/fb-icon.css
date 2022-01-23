@@ -1,0 +1,60 @@
+.fb{
+    background-image: url(../assets/icon/VFOGzUJ7O3f.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    margin-right: 4px;
+}
+.fb-icon-add{
+    background-position: 0px -1530px;
+    width: 16px;
+    height: 16px;
+    -webkit-filter: var(--filter-always-white);
+}
+.fb-icon-public{
+    background-image: url(../assets/icon/-5rP9tSOk1F.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    background-position: 0px -415px;
+    -webkit-filter: var(--filter-placeholder-icon);
+    width: 20px;
+    height: 20px;
+}
+.fb-icon-private{
+    background-image: url(../assets/icon/-5rP9tSOk1F.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    background-position: 0px -562px;
+    -webkit-filter: var(--filter-placeholder-icon);
+    width: 20px;
+    height: 20px;
+}
+.fb-icon-pencil{
+    background-image: url(../assets/icon/pencil.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    -webkit-filter: var(--filter-primary-icon);
+    width: 20px;
+    height: 20px;
+}
+.fb-icon-addfr{
+    background-image: url(../assets/icon/add-friend.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    -webkit-filter: var(--filter-always-white);
+    width: 20px;
+    height: 20px;
+}
+.fb-icon-isFriend{
+    background-image: url(../assets/icon/isFriend.png);
+    background-size: auto;
+    background-repeat: no-repeat;
+    display: inline-block;
+    -webkit-filter: var(--filter-primary-icon);
+    width: 20px;
+    height: 20px;
+}

@@ -36,6 +36,7 @@
 }
 
 .overview .header .wrap-avatar-username:hover{
+    cursor: pointer;
     background-color: #efefef;
 }
 
@@ -54,13 +55,16 @@
 
 .overview .content{
     display: flex;
-    height: calc(100vh - 72px);
-    margin-top: 16px;
-    overflow: auto;
-    justify-content: center;
+    flex-direction: column;
+    height: calc(100vh - 56px);
+    overflow: hidden;
+    overflow-y: scroll;
     box-sizing: border-box;
 }
-
+.overview .content .body-content{
+    display: flex;
+    box-sizing: border-box;
+}
 /* Left-bar */
 .overview .left-bar{
     width: var(--sidebarLeft-width);
@@ -76,8 +80,8 @@
 /* Center */
 .overview .center{
     width: var(--content-width);
-    margin: 0 5%;
-    font-size: 14px;
+    padding: 0 8%;
+    min-height: 600px;
 }
 
 /* Right-bar */
@@ -88,11 +92,13 @@
 .button-icon{
 margin-left: 10px;
 }
-.icon-message{
+.icon-message-noti{
     background: url(../../../assets/svg/feedback-svgrepo-com.svg);
     background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%)
 }
 .icon-notify{
     background-image: url(../../../assets/svg/bell-alert-svgrepo-com.svg);
     background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%)
 }

@@ -1,6 +1,8 @@
 <template>
     <div>
-        <div class="wrap-button-text" :class="{ 'disable': disable }" :style="{'width': Width + 'px'}">{{ text }}</div>
+        <div class="wrap-button-text" 
+        :class="{ 'disable': disable }" 
+        :style="{'width': Width + 'px' , 'height' : Height + 'px', 'border-radius' : border_radius + 'px'}">{{ text }}</div>
     </div>
 </template>
 <script>
@@ -12,8 +14,16 @@ export default {
             default: ""
         },
         Width: {
+            type: [Number, String],
+            default: "auto"
+        },
+        Height: {
             type: Number,
-            default: 80
+            default: 35
+        },
+        border_radius:{
+            type: Number,
+            default: 20,
         },
         disable:{
             type: Boolean,
@@ -35,6 +45,8 @@ export default {
     color: #ffffff;
     box-sizing: border-box;
     font-weight: 500;
+    white-space: nowrap;
+    padding: 0 10px;
 }
 .wrap-button-text:hover{
     background-color: #3c8bf3;
