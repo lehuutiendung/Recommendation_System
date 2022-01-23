@@ -1,0 +1,21 @@
+.icon-email{
+    background-image: url(../assets/icon/xYnteFyX4Gg.png);
+    background-position: 0 -46px;
+    width: 20px;
+	height: 20px;
+    -webkit-filter: var(--filter-placeholder-icon);
+}
+.icon-clock{
+    background-image: url(../assets/svg/clock-svgrepo-com.svg);
+    background-size: contain;
+	width: 20px;
+	height: 20px;
+    -webkit-filter: var(--filter-placeholder-icon);
+}
+.icon-quotes{
+    background-image: url(../assets/svg/quotes-svgrepo-com.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+    -webkit-filter: var(--filter-placeholder-icon);
+}

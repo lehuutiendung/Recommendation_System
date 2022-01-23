@@ -43,6 +43,7 @@
 <script>
 import axios from "axios";
 import PopupRegister from "@/views/GettingStarted/PopupRegister.vue"
+import {EventBus} from "../../main"
 export default {
     name: 'GettingStarted',
     components:{
@@ -95,7 +96,11 @@ export default {
                 this.$cookie.set('jwtToken', res.data.accessToken, { expires: '1D' });
                 this.$cookie.set('u_id', res.data.id, {expires: '1D'});
                 this.$cookie.set('u_name', res.data.userName, {expires: '1D'});
+            }).then(() => {
+                EventBus.$emit('showHeaderApp');
                 this.$router.push('/');
+                // Bắn socket chứa userID khi user online
+                this.$socket.emit('user-online', this.$cookie.get('u_id'));
             })
             .catch(err => {
                 if(err.response.status == 404){

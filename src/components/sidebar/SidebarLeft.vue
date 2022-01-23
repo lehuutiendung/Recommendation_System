@@ -2,21 +2,26 @@
     <div class="sidebar-left">
         <div class="wrap-sidebar">
             <div class="">
-                <router-link to="/personal" class="wrap-item flex">
-                    <div class="icon-32 icon-avatar"></div>
+                <div class="wrap-item flex" @click="redirectToPersonal">
+                    <div class="icon-32 icon-avatar">
+                        <cld-image 
+                            :publicId="avatar.cloudinaryID">
+                            <cld-transformation gravity="south" crop="fill"/>
+                        </cld-image>
+                    </div>
                     <div class="name-item">
                         <div class="username">{{ userName }}</div>
                         <div class="title">Trang cá nhân</div>
                     </div>
-                </router-link>
-                <router-link to="/" class="wrap-item">
+                </div>
+                <router-link to="/" class="wrap-item" >
                     <div class="icon-32 icon-newsfeed"></div>
                     <div class="name-item">Bảng tin</div>
                 </router-link>
-                <div class="wrap-item">
+                <router-link to="/group" class="wrap-item" >
                     <div class="icon-32 icon-group"></div>
                     <div class="name-item">Nhóm</div>
-                </div>
+                </router-link>
                 <div class="wrap-item">
                     <div class="icon-32 icon-message"></div>
                     <div class="name-item">Tin nhắn</div>
@@ -32,8 +37,25 @@ export default {
         userName:{
             type: String,
             default: "",
+        },
+        avatar: {
+            type: Object,
+            default(){
+                return {}
+            }
         }
-    }
+    },
+    methods: {
+        /**
+         * Chuyển hướng đến trang cá nhân
+         */
+        redirectToPersonal(){
+            this.$router.push({
+                name: 'Personal',
+                params: { id: this.$cookie.get('u_id')}
+            }).catch(()=>{});
+        }
+    },
 }
 </script>
 <style scoped>

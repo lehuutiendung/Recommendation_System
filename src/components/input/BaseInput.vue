@@ -2,27 +2,31 @@
     <div class="wrap-input" :style="{width : width}">
         <!-- Label của input -->
         <div class="input-label">{{ label }}<span class="required" v-if="required">&nbsp;*</span></div>
-        <div class="custome-input-date" v-if="isInputDate">
-            <date-picker v-model="date" :lang="lang" format="DD-MM-YYYY" @change="handleChange"></date-picker>
+        <div class="wrap-input-view" v-if="stateView">{{ value ? value : '-' }}</div>
+        <div class="custome-input-date" v-if="isInputDate && !stateView">
+            <date-picker v-model="date" :value="value" :lang="lang" format="DD-MM-YYYY" @change="handleChange"></date-picker>
         </div>
         <input type="text"
         class="input-text"
-        :class="{ 'required' : required }"
+        :value="value"
+        :class="{ 'required' : required , 'input-view' : stateView }"
         :maxlength="maxlength" 
         v-on="inputListeners" 
-        v-if="!isInputDate && !isPassword"
+        v-if="!isInputDate && !isPassword && !stateView"
         >
         <input type="password"
         class="input-text" 
         :class="{ 'required' : required}"
         v-on="inputListeners" 
-        v-if="isPassword"
+        v-if="isPassword && !stateView"
         >
     </div>
 </template>
 <script>
 import DatePicker from 'vue2-datepicker';
 import 'vue2-datepicker/index.css';
+import moment from "moment"
+
 export default {
     name: 'BaseInput',
     components: {
@@ -70,9 +74,21 @@ export default {
         maxlength: {
             type: Number,
             default(){
-                return 10;
+                return 255;
             }
         },
+        autoFocus: {
+            type: Boolean,
+            default: false
+        },
+        stateView: {
+            type: Boolean,
+            deafult: false
+        },
+        ISODate: {
+            type: String,
+            default: ""
+        }
     },
     data() {
         return {
@@ -91,6 +107,11 @@ export default {
                         return date > new Date();
                  }
             },
+        }
+    },
+    mounted() {
+        if(this.autoFocus){
+            this.focusFirstField();
         }
     },
     computed: {
@@ -112,11 +133,24 @@ export default {
         */ 
         handleChange(e){
             this.$emit('datepicker', e);
-        }
+        },
+        /**
+         * Focus trường input đầu tiên
+         */
+        focusFirstField(){
+            document.querySelectorAll('input')[0].focus();
+        },
     },
+    watch: {
+        stateView: function(){
+            if(!this.stateView){
+                this.date = moment(this.ISODate).utc(this.ISODate).toDate();
+            }
+        }
+    }
 }
 </script>
-<style scoped>
+<style lang="scss">
 .input-label{
     margin-bottom: 6px;
 }
@@ -129,6 +163,14 @@ export default {
 .input-text:focus{
     border: 1px solid rgb(50, 177, 236);
 }
+// Css input trong màn xem
+.wrap-input-view{
+    width: -webkit-fill-available;
+    height: 36px;
+    padding: 8px 10px;
+    border-bottom: 1px solid #cccccc;
+    font-weight: 500;
+}
 .input-label .required{
     color: red;
 }
@@ -139,4 +181,15 @@ export default {
     display: flex;
     align-items: center;
 }
-</style>
+.wrap-input{
+    .mx-datepicker{
+        width: 100% !important;
+    }
+}
+.mx-input{
+    color: #000000 !important;
+    font-weight: 400;
+    font-size: 15px;
+}
+
+</style>    

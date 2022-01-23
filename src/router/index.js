@@ -25,12 +25,88 @@ let router = new VueRouter({
                     path: '',
                     name: 'NewsFeed',
                     component: () => import('@/views/NewsFeed/NewsFeed.vue'),
+                }
+            ]
+        },
+        {
+            path: '/personal',
+            name: 'Personal',
+            redirect: '/personal/:id',
+            component: () => import('@/views/Personal/PersonalPage.vue'),
+            meta: {
+                requiresAuth: true
+            },
+            children: [
+                {
+                    path: '/personal/:id',
+                    name: 'Personal.TabTimelinePersonal',
+                    component: () => import('@/views/Personal/ListTabView/TabTimeline.vue'),
                 },
                 {
-                    path: '/personal',
-                    name: 'Personal',
-                    component: () => import('@/views/Personal/PersonalPage.vue'),
-                }
+                    path: '/personal/:id/about',
+                    name: 'Personal.TabAboutPersonal',
+                    component: () => import('@/views/Personal/ListTabView/TabAbout.vue'),
+                },
+                {
+                    path: '/personal/:id/library',
+                    name: 'Personal.TabLibraryPersonal',
+                    component: () => import('@/views/Personal/ListTabView/TabLibrary.vue'),
+                },
+                {
+                    path: '/personal/:id/friends',
+                    redirect: '/personal/:id/friends/all',
+                    name: 'Personal.TabFriendPersonal',
+                    component: () => import('@/views/Personal/ListTabView/TabFriend.vue'),
+                    children: [
+                        {
+                            path: '/personal/:id/friends/all',
+                            name: 'TabAllFriend',
+                            component: () => import('@/views/Personal/ListTabView/SubTabFriend/TabAllFriend.vue'),
+                        },
+                    ]
+                },
+            ]
+        },
+        {
+            path: '/group',
+            name: 'OverviewGroup',
+            component: () => import('@/views/Group/OverviewGroup.vue'),
+            meta: {
+                requiresAuth: true
+            },
+        },
+        {
+            path: '/group/create',
+            name: 'AddGroup',
+            component: () => import('@/views/Group/AddGroup.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
+            path: '/group/:id',
+            redirect: '/group/:id/about',
+            name: 'GroupDetail',
+            component: () => import('@/views/Group/GroupDetail.vue'),
+            meta: {
+                requiresAuth: true
+            },
+            children: [
+                {
+                    path: '/group/:id',
+                    name: 'GroupDetail.TabDiscussionGroup',
+                    component: () => import('@/views/Group/ListTabView/TabDiscussion.vue'),
+                },
+                {
+                    path: '/group/:id/about',
+                    name: 'GroupDetail.TabGeneralGroup',
+                    component: () => import('@/views/Group/ListTabView/TabGeneral.vue'),
+                },
+                {
+                    path: '/group/:id/member',
+                    name: 'GroupDetail.TabMemberGroup',
+                    component: () => import('@/views/Group/ListTabView/TabMember.vue'),
+                },
             ]
         },
     ]

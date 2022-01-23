@@ -17,6 +17,15 @@ export default class BaseAPI {
     }
 
     /**
+     * Hàm gọi phương thức post, lấy dữ liệu phân trang
+     * @created 12/8/2021
+     * @returns
+     */
+    getPaging(data){
+        return BaseAPIConfig.post(`${this.controller}/paging`, data);
+    }
+
+    /**
      * Hàm gọi phương thức get, lấy dữ liệu theo ID
      * @created 25/11/2021
      */
@@ -41,5 +50,14 @@ export default class BaseAPI {
      */
     save(data){
         return BaseAPIConfig.post(`${this.controller}`, data);
+    }
+    
+    /**
+     * Hàm gọi phương thức put, cập nhật dữ liệu
+     * @param {*} data 
+     * @returns 
+     */
+    update(id, data){
+        return BaseAPIConfig.put(`${this.controller}/${id}`, data);
     }
 }

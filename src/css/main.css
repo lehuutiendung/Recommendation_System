@@ -1,7 +1,10 @@
+@import url(./margin-padding.css);
+@import url(./fb-icon.css);
+@import url(./svg-icon.css);
 html, body{
     margin: 0;
     padding: 0;
-    font-size: 14px;
+    font-size: 15px;
     font-family: Roboto,Helvetica,Arial,sans-serif !important;
     overflow: hidden;
     height: 100%;
@@ -101,11 +104,23 @@ html, body{
     min-width: 48px;
     min-height: 48px;
 }
+/* CSS cho icon 56px */
+.icon-56{
+    width: 56px;
+    height: 56px;
+    min-width: 56px;
+    min-height: 56px;
+}
 .icon-avatar{
-    background: url(../assets/Avatar.jpg);
+    /* background: url(../assets/Avatar.jpg); */
     background-size: contain;
     border-radius: 50%;
     cursor: pointer;
+}
+.icon-avatar img{
+    width: inherit;
+    height: inherit;
+    border-radius: 50%;
 }
 
 /* Start: Button icon */
@@ -142,6 +157,12 @@ html, body{
     background-color: #dddddd;
     cursor: pointer;
 }
+/* CSS font size */
+.text-size-24{
+    font-size: 24px;
+    font-weight: 450;
+}
+
 /* CSS cho thanh scroll */
 ::-webkit-scrollbar {
   width: 8px;
@@ -157,11 +178,27 @@ html, body{
     background: #f1f1f1;
 }
 :root{
+    --shadow-008: 0 1px 2px rgba(0, 0, 0, 0.08);
     --header-height: 56px;
-    --content-width: 50vw;
+    --content-width: 55vw;
     --sidebarLeft-width: calc((100% - var(--content-width))/2);
     --sidebarRight-width: calc((100% - var(--content-width))/2);
+    /* Custom cho Personal Page */
+    --content-width-personal: 40vw;
+    --sidebarLeft-width-personal: calc((100% - var(--content-width-personal))/2);
+    --sidebarRight-width-personal: calc((100% - var(--content-width-personal))/2);
+
     --background-app: #F0F2F5;
+    --filter-accent: invert(39%) sepia(57%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(147.75%) hue-rotate(202deg) brightness(97%) contrast(96%);
+    --filter-always-white: invert(100%);
+    --filter-disabled-icon: invert(80%) sepia(6%) saturate(200%) saturate(120%) hue-rotate(173deg) brightness(98%) contrast(89%);
+    --filter-placeholder-icon: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(96%) contrast(94%);
+    --filter-primary-icon: invert(8%) sepia(10%) saturate(200%) saturate(200%) saturate(166%) hue-rotate(177deg) brightness(104%) contrast(91%);
+    --filter-secondary-icon: invert(39%) sepia(21%) saturate(200%) saturate(109.5%) hue-rotate(174deg) brightness(94%) contrast(86%);
+    --filter-warning-icon: invert(77%) sepia(29%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(128%) hue-rotate(359deg) brightness(102%) contrast(107%);
+    --filter-blue-link-icon: invert(30%) sepia(98%) saturate(200%) saturate(200%) saturate(200%) saturate(166.5%) hue-rotate(192deg) brightness(91%) contrast(101%);
+    --filter-positive: invert(37%) sepia(61%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(115%) hue-rotate(91deg) brightness(97%) contrast(105%);
+    --filter-negative: invert(25%) sepia(33%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(200%) saturate(110%) hue-rotate(345deg) brightness(132%) contrast(96%);
 }
 /* Css margin */
 .mg-r-10{
@@ -170,8 +207,16 @@ html, body{
 .mg-l-10{
     margin-left: 10px;
 }
+.mg-t-10{
+    margin-top: 10px;
+}
 .mg-b-10{
     margin-bottom: 10px;
+}
+
+/* Width */
+.w-full{
+    width: 100%;
 }
 
 /* CSS cursor input */

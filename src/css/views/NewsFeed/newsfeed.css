@@ -10,8 +10,8 @@
     display: flex;  
     flex-direction: column;
     padding: 14px;
-    border: 1px solid #dddddd;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    border: 1px solid #eeeeee;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
     margin-bottom: 15px;
 }
 .box-status .wrap-content{
