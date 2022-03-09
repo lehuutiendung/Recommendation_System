@@ -2,12 +2,16 @@
     <div class="write-comment" @mouseleave="hidePopupOption">
         <div class="icon-32 icon-avatar avatar-comment">
             <cld-image 
-                :publicId="avatar.cloudinaryID">
+                :publicId="avatar.cloudinaryID" v-if="isEdit">
+                <cld-transformation gravity="south" crop="fill"/>
+            </cld-image>
+            <cld-image 
+                :publicId="dataComment.owner.avatar.cloudinaryID" v-else>
                 <cld-transformation gravity="south" crop="fill"/>
             </cld-image>
         </div>
         <div class="content-cmt-write" :class="{'auto-w' : !isEdit}">
-            <div class="username" v-if="!isEdit">Lê Hữu Tiến Dũng</div>
+            <div class="username" v-if="!isEdit">{{ dataComment.owner.userName }}</div>
             <div class="comment" contenteditable="true" 
             v-if="isEdit"
             v-on="listeners" 
@@ -29,7 +33,7 @@
                 </div>
             </div>
         </div>
-        <div class="icon-24 option-comment" v-if="dataComment.owner == userID" @click="showOption" v-click-outside="hidePopupOption">
+        <div class="icon-24 option-comment" v-if="!isEdit && dataComment.owner._id == userID" @click="showOption" v-click-outside="hidePopupOption">
             <div class="icon-14 icon-three-dots"></div>
             <div class="popup-option" v-if="isShowOption">
                 <div class="item-option" @click="updateComment">Chỉnh sửa bình luận</div>

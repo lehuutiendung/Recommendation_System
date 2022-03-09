@@ -21,8 +21,8 @@ export default class BaseAPI {
      * @created 12/8/2021
      * @returns
      */
-    getPaging(data){
-        return BaseAPIConfig.post(`${this.controller}/paging`, data);
+    async getPaging(data){
+        return await BaseAPIConfig.post(`${this.controller}/paging`, data);
     }
 
     /**

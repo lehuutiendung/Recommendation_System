@@ -88,6 +88,9 @@ export default {
             this.contentStatus = "";
             this.isShowStatus = false;
         },
+        /**
+         * Lấy dữ liệu phân trang bài viết
+         */
         getPagingData(){
             if(this.pageIndex > this.totalPage){
                 return;
@@ -101,7 +104,24 @@ export default {
             PostAPI.getPaging(dataReq).then( res => {
                 this.totalPage = res.data.data.totalPage;
                 //Push thêm data vào listDataPost
-                this.listDataPost = [...this.listDataPost, ...res.data.data.doc];
+                let lstResData = res.data.data.doc;
+                lstResData.forEach(item => {
+                    if(!this.listDataPost.find(x => x._id === item._id)){
+                        this.listDataPost.push(item);
+                    }
+                });
+            })
+        },
+        /**
+         * Gọi API lấy bài viết mới nhất
+         */
+        getTopData(){
+            let dataReq = {
+                userID: this.$cookie.get('u_id')
+            }
+            PostAPI.getTopInNewsfeed(dataReq).then( res => {
+                //Push thêm data vào đầu listDataPost
+                this.listDataPost.unshift(res.data.doc[0]);
             })
         },
         /**
@@ -117,7 +137,7 @@ export default {
          * Gọi API lưu bài viết
          * @created 25/11/2021
          */
-        createPost(files, oldImage){
+        async createPost(files, oldImage){
             let formData = new FormData();
             formData.append('owner', this.$cookie.get('u_id'));
             formData.append('content', this.contentStatus);
@@ -127,17 +147,18 @@ export default {
                 formData.append('image', file);
             }
 
-            this.listDataPost = [];
+            // this.listDataPost = [];
             this.pageIndex = 0;
             this.totalPage = 0;
 
             if(this.statePopup == State.Insert){
-                PostAPI.save(formData).then(()=>{
-                    this.hideStatus();
-                    console.log('new feed');
-                }).then(()=>{
-                    console.log('abc');
-                    this.getPagingData();
+                await PostAPI.save(formData).then((res)=>{
+                    if(res.data.status === "Success"){
+                        this.hideStatus();
+                        this.getTopData();
+                    }else{
+                        this.hideStatus();
+                    }
                 });
             }else{
                 PostAPI.update(this.dataPost._id, formData).then(() => {
