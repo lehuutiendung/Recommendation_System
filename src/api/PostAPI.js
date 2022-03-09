@@ -22,5 +22,13 @@ class PostAPI extends BaseAPI {
      getPagingInWall(data){
         return BaseAPIConfig.post(`${this.controller}/paging/inwall`, data);
     }
+
+    /**
+     * Lấy bài viết mới nhất trên trang newsfeed
+     * @returns
+     */
+     getTopInNewsfeed(data){
+        return BaseAPIConfig.post(`${this.controller}/top-post`, data);
+    }
 }
 export default new PostAPI();

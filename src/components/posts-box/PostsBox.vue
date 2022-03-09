@@ -77,9 +77,20 @@
             </div>
         </div>
         <div class="border-box-comment">
-            <Comment v-model="commentText" :avatar="avatar" :isEdit="true" :dataPost="dataPost" @updatePagingComment="updatePagingComment"/>
+            <Comment v-model="commentText" 
+            :avatar="avatar" 
+            :isEdit="true" 
+            :dataPost="dataPost" 
+            @updatePagingComment="updatePagingComment"/>
             <div class="box-comment" v-for="(item, index) of listDataComment" :key="index">
-                <Comment v-model="commentText" :isEdit="item._id == commentEditID && isUpdateState ? true : false" :isUpdateState="isUpdateState" :dataComment="item" :dataPost="dataPost" :userID="userID" @updatePagingComment="updatePagingComment" @updateComment="updateComment"/>
+                <Comment v-model="commentText" 
+                :isEdit="item._id == commentEditID && isUpdateState ? true : false" 
+                :isUpdateState="isUpdateState" 
+                :dataComment="item" 
+                :dataPost="dataPost" 
+                :userID="userID" 
+                @updatePagingComment="updatePagingComment" 
+                @updateComment="updateComment"/>
             </div>
             <div class="load-more-comment" v-if="pageIndex < totalPage" @click="handleMoreLoad">Xem thêm bình luận</div>
         </div> 
