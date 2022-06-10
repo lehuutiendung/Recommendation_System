@@ -30,7 +30,7 @@
                 <div class="m-t-10">100 {{ $t('i18nPersonal.TabTimeline.FriendText' )}}</div>
                 <div class="grid-friend">
                     <div class="grid-item" v-for="(friend, index) in topFriend" :key="index">
-                        <div class="avatar-fr" @click="redirectToPageFriend(friend._id)">
+                        <div class="picture" @click="redirectToPageFriend(friend._id)">
                             <cld-image 
                                 :publicId="friend.avatar.imageURL" 
                                 loading="lazy">
@@ -111,7 +111,7 @@
                     </div>
                 </div>
                 <div class="wrap-posts" v-for="item in listDataPost" :key="item._id">
-                    <PostsBox :userID="userID" :dataPost="item" @deletePost="deletePost" @forwardData="forwardData"/>
+                    <PostsBox :userID="userID" :avatar="avatar" :dataPost="item" @deletePost="deletePost" @forwardData="forwardData"/>
                 </div>
                 <Observer @getPaging="getPagingData"/>
                 <PopupCreateStatus v-if="isShowStatus" 
@@ -197,11 +197,11 @@ export default {
         }
     },
     created() {
-        //TODO: Cần check lại, tại sao lại có groupID trong trang cá nhân
+        let userInfor = this.$store.getters.userInfor;
+        this.avatar= userInfor.avatar;
         this.groupID = this.$route.params.id;
         this.getTopFriend();
         this.getInfoUser();
-        this.getInforOwner();
     },
     mounted() {
         this.userID = this.$route.params.id;
@@ -329,14 +329,6 @@ export default {
             })
         },
         /**
-         * Call API lấy thông tin của người dùng đang đăng nhập tài khoản
-         */
-        getInforOwner(){
-            UserAPI.getByID(this.$cookie.get('u_id')).then((res) => {
-                this.avatar = res.data.doc.avatar;
-            })
-        },
-        /**
          * Chuyển hướng đến trang cá nhân bạn bè
          */
         redirectToPageFriend(userID){
@@ -405,9 +397,8 @@ export default {
         padding-left: 2%;
         padding-right: 4%;
         overflow: inherit!important;
-        
+        position: relative;
         .box-friend{
-            min-height: 350px;
             .flex-spacebetween{
                 display: flex;
                 justify-content: space-between;
@@ -418,17 +409,18 @@ export default {
                 margin-top: 10px;
                 grid-column-gap: 10px;
                 grid-row-gap: 10px;
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
                 .grid-item{
                     aspect-ratio: 1;
-                    .avatar-fr{
+                    -webkit-transition: all .2s ease-in-out;
+                    .picture{
                         width: 100%;
                         height: 100%;
-                        background-color: red;
-                        border-radius: 4px;
                         img{
+                            border-radius: 4px;
                             width: 100%;
                             height: 100%;
+                            object-fit: cover;
                         }
                     }
                     .name-fr{

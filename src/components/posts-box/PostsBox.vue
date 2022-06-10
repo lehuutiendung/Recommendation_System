@@ -1,99 +1,107 @@
 <template>
-    <div class="posts-box">
-        <div class="wrap-item mg-b-10">
-            <div class="icon-40 icon-avatar" @click="redirectToPersonal">
-                <cld-image 
-                    :publicId="ownerPost.cloudinaryID">
-                    <cld-transformation gravity="south" crop="fill"/>
-                </cld-image>
+    <div>
+        <div class="posts-box">
+            <div class="wrap-item mg-b-10">
+                <div class="icon-40 icon-avatar" @click="redirectToPersonal">
+                    <cld-image 
+                        :publicId="ownerPost.cloudinaryID">
+                        <cld-transformation gravity="south" crop="fill"/>
+                    </cld-image>
+                </div>
+                <div class="name-item">
+                    <span class="wrap-username">
+                        <div class="username" @click="redirectToPersonal">{{ownerPost.ownerName}}</div>
+                        <div class="flex" v-if="dataPost.belongToGroup != null && showInfoGroup">
+                            <div class="arrow-group"></div>
+                            <div class="name-group">{{ dataPost.belongToGroup.name }}</div>
+                        </div>
+                    </span>
+                    <div class="time">{{ dayOfCreated }}</div>
+                </div>
             </div>
-            <div class="name-item">
-                <span class="wrap-username">
-                    <div class="username" @click="redirectToPersonal">{{ownerPost.ownerName}}</div>
-                    <div class="flex" v-if="dataPost.belongToGroup != null && showInfoGroup">
-                        <div class="arrow-group"></div>
-                        <div class="name-group">{{ dataPost.belongToGroup.name }}</div>
+            <!-- Three dots -->
+            <div class="icon-32 option-post" v-if="dataPost.owner._id == userID" @click="showOption" v-click-outside="hidePopupOption">
+                <div class="icon-16 icon-three-dots"></div>
+            </div>
+            <!-- Popup lựa chọn của bài viết -->
+            <div class="popup-option" v-if="isShowOption">
+                <div class="item-option" @click="updatePost">Chỉnh sửa bài viết</div>
+                <div class="item-option item-delete" @click="deletePost">Xóa bài viết</div>
+            </div>
+            <div class="content-text mg-b-10">{{ dataPost.content }}</div>
+            <div class="multiple-img">
+                <div class="content-img" v-for="(image, key) in dataPost.image" :key="key">
+                    <!-- <img :src="image.imageURL" alt="" @click.native="viewFullImage(image.imageURL)"> -->
+                    <cld-image 
+                        :publicId="image.imageURL" 
+                        loading="lazy" @click.native="viewFullImage(image.imageURL)">
+                        <cld-transformation width="auto" gravity="south" crop="fill"/>
+                    </cld-image>
+                </div>
+            </div>
+            <div class="view-number">
+                <div class="view-react"></div>
+                <div class="group-comment-share flex">
+                    <div class="view-comment" v-if="totalRecord > 0">{{ totalRecord }} bình luận</div>
+                    <div class="view-share">2 lượt chia sẻ</div>
+                </div>
+            </div>
+            <div class="view-button">
+                <div class="group-btn" @mouseleave="hideEmoticon" @click.exact="clickReactDefault">
+                    <div class="flex reaction-hover" @mouseover="showEmoticon">
+                        <div class="icon-18 icon-like" 
+                        :class="{'icon-like-active':isLike, 
+                                'icon-love':isLove, 
+                                'icon-haha':isHaha, 
+                                'icon-wow':isWow,       
+                                'icon-sad':isSad, 
+                                'icon-angry':isAngry }"></div>
+                        <div class="btn-name" v-if="isNoReaction">{{ $t('i18nNewsFeed.PostsCard.Like') }}</div>
+                        <div class="btn-name text-like" v-if="isLike">{{ $t('i18nNewsFeed.PostsCard.Like') }}</div>
+                        <div class="btn-name text-love" v-if="isLove">{{ $t('i18nNewsFeed.PostsCard.Love') }}</div>
+                        <div class="btn-name text-haha" v-if="isHaha">{{ $t('i18nNewsFeed.PostsCard.Haha') }}</div>
+                        <div class="btn-name text-wow" v-if="isWow">{{ $t('i18nNewsFeed.PostsCard.Wow') }}</div>
+                        <div class="btn-name text-sad" v-if="isSad">{{ $t('i18nNewsFeed.PostsCard.Sad') }}</div>
+                        <div class="btn-name text-angry" v-if="isAngry">{{ $t('i18nNewsFeed.PostsCard.Angry') }}</div>
                     </div>
-                </span>
-                <div class="time">50 phút</div>
-            </div>
-        </div>
-        <!-- Three dots -->
-        <div class="icon-32 option-post" v-if="dataPost.owner == userID" @click="showOption" v-click-outside="hidePopupOption">
-            <div class="icon-16 icon-three-dots"></div>
-        </div>
-        <!-- Popup lựa chọn của bài viết -->
-        <div class="popup-option" v-if="isShowOption">
-            <div class="item-option" @click="updatePost">Chỉnh sửa bài viết</div>
-            <div class="item-option item-delete" @click="deletePost">Xóa bài viết</div>
-        </div>
-        <div class="content-text mg-b-10">{{ dataPost.content }}</div>
-        <div class="multiple-img">
-            <div class="content-img" v-for="(image, key) in dataPost.image" :key="key">
-                <img :src="image.imageURL" alt="">
-            </div>
-        </div>
-        <div class="view-number">
-            <div class="view-react"></div>
-            <div class="group-comment-share flex">
-                <div class="view-comment" v-if="totalRecord > 0">{{ totalRecord }} bình luận</div>
-                <div class="view-share">2 lượt chia sẻ</div>
-            </div>
-        </div>
-        <div class="view-button">
-            <div class="group-btn" @mouseleave="hideEmoticon" @click.exact="clickReactDefault">
-                <div class="flex reaction-hover" @mouseover="showEmoticon">
-                    <div class="icon-18 icon-like" 
-                    :class="{'icon-like-active':isLike, 
-                            'icon-love':isLove, 
-                            'icon-haha':isHaha, 
-                            'icon-wow':isWow,       
-                            'icon-sad':isSad, 
-                            'icon-angry':isAngry }"></div>
-                    <div class="btn-name" v-if="isNoReaction">{{ $t('i18nNewsFeed.PostsCard.Like') }}</div>
-                    <div class="btn-name text-like" v-if="isLike">{{ $t('i18nNewsFeed.PostsCard.Like') }}</div>
-                    <div class="btn-name text-love" v-if="isLove">{{ $t('i18nNewsFeed.PostsCard.Love') }}</div>
-                    <div class="btn-name text-haha" v-if="isHaha">{{ $t('i18nNewsFeed.PostsCard.Haha') }}</div>
-                    <div class="btn-name text-wow" v-if="isWow">{{ $t('i18nNewsFeed.PostsCard.Wow') }}</div>
-                    <div class="btn-name text-sad" v-if="isSad">{{ $t('i18nNewsFeed.PostsCard.Sad') }}</div>
-                    <div class="btn-name text-angry" v-if="isAngry">{{ $t('i18nNewsFeed.PostsCard.Angry') }}</div>
+                    <div class="group-emoticon" v-if="isShowEmoticon">
+                        <div class="icon-36 mg-r-10 icon-emoticon like-emoticon" @click="clickEmoticon($event,4)"></div>
+                        <div class="icon-36 mg-r-10 icon-emoticon love-emoticon" @click="clickEmoticon($event,6)"></div>
+                        <div class="icon-36 mg-r-10 icon-emoticon haha-emoticon" @click="clickEmoticon($event,5)"></div>
+                        <div class="icon-36 mg-r-10 icon-emoticon wow-emoticon" @click="clickEmoticon($event,3)"></div>
+                        <div class="icon-36 mg-r-10 icon-emoticon sad-emoticon" @click="clickEmoticon($event,2)"></div>
+                        <div class="icon-36 mg-r-10 icon-emoticon angry-emoticon" @click="clickEmoticon($event,1)"></div>
+                    </div>
                 </div>
-                <div class="group-emoticon" v-if="isShowEmoticon">
-                    <div class="icon-36 mg-r-10 icon-emoticon like-emoticon" @click="clickEmoticon($event,1)"></div>
-                    <div class="icon-36 mg-r-10 icon-emoticon love-emoticon" @click="clickEmoticon($event,2)"></div>
-                    <div class="icon-36 mg-r-10 icon-emoticon haha-emoticon" @click="clickEmoticon($event,3)"></div>
-                    <div class="icon-36 mg-r-10 icon-emoticon wow-emoticon" @click="clickEmoticon($event,4)"></div>
-                    <div class="icon-36 mg-r-10 icon-emoticon sad-emoticon" @click="clickEmoticon($event,5)"></div>
-                    <div class="icon-36 mg-r-10 icon-emoticon angry-emoticon" @click="clickEmoticon($event,6)"></div>
+                <div class="group-btn">
+                    <div class="icon-18 icon-comment"></div>
+                    <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Comment') }}</div>
+                </div>
+                <div class="group-btn">
+                    <div class="icon-18 icon-share"></div>
+                    <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Share') }}</div>
                 </div>
             </div>
-            <div class="group-btn">
-                <div class="icon-18 icon-comment"></div>
-                <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Comment') }}</div>
-            </div>
-            <div class="group-btn">
-                <div class="icon-18 icon-share"></div>
-                <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Share') }}</div>
-            </div>
-        </div>
-        <div class="border-box-comment">
-            <Comment v-model="commentText" 
-            :avatar="avatar" 
-            :isEdit="true" 
-            :dataPost="dataPost" 
-            @updatePagingComment="updatePagingComment"/>
-            <div class="box-comment" v-for="(item, index) of listDataComment" :key="index">
+            <div class="border-box-comment">
                 <Comment v-model="commentText" 
-                :isEdit="item._id == commentEditID && isUpdateState ? true : false" 
-                :isUpdateState="isUpdateState" 
-                :dataComment="item" 
+                :avatar="avatar" 
+                :isEdit="true" 
                 :dataPost="dataPost" 
-                :userID="userID" 
-                @updatePagingComment="updatePagingComment" 
-                @updateComment="updateComment"/>
-            </div>
-            <div class="load-more-comment" v-if="pageIndex < totalPage" @click="handleMoreLoad">Xem thêm bình luận</div>
-        </div> 
+                @updatePagingComment="updatePagingComment"/>
+                <div class="box-comment" v-for="(item, index) of listDataComment" :key="index">
+                    <Comment v-model="commentText" 
+                    :isEdit="item._id == commentEditID && isUpdateState ? true : false" 
+                    :isUpdateState="isUpdateState" 
+                    :dataComment="item" 
+                    :dataPost="dataPost" 
+                    :userID="userID" 
+                    @updatePagingComment="updatePagingComment" 
+                    @updateComment="updateComment"/>
+                </div>
+                <div class="load-more-comment" v-if="pageIndex < totalPage" @click="handleMoreLoad">Xem thêm bình luận</div>
+            </div> 
+        </div>
+        <ZoomImage v-if="showZoomImage" :dataZoomImage="dataZoomImage" @exitDimmed="exitDimmed"></ZoomImage>
     </div>
 </template>
 <script>
@@ -101,14 +109,29 @@ import ClickOutSide from "@/mixins/detectoutside.js"
 import {Reaction} from "@/models/enums/Reaction.js"
 import CommentAPI from "@/api/CommentAPI.js"
 import Comment from "@/components/comment/Comment.vue"
-import UserAPI from "@/api/UserAPI.js"
+import CommonFunction from "@/common/commonFunction.js"
+import {State} from "@/models/enums/State.js"
+import PostAPI from "@/api/PostAPI.js"
+import ZoomImage from "@/components/zoom-image/ZoomImage.vue"
+// import UserAPI from "@/api/UserAPI.js"
+// import {EventBus} from "../../main"
+/**
+ * Quy thang điểm rating: 
+ * 1 angry
+ * 2 sad
+ * 3 wow
+ * 4 like
+ * 5 haha
+ * 6 love
+ */
 export default {
     name: "PostsBox",
     directives: {
         ClickOutSide
     },
     components:{
-        Comment
+        Comment,
+        ZoomImage
     },
     props:{
         value: {
@@ -167,7 +190,10 @@ export default {
                 cloudinaryID: "",
                 ownerName: "",
                 ownerID: "",
-            },      
+            },
+            dayOfCreated: "",  
+            showZoomImage: false,
+            dataZoomImage: ""
         }
     },
     computed: {
@@ -176,13 +202,12 @@ export default {
         },
     },
     created() {
-        UserAPI.getByID(this.dataPost.owner).then((res)=>{
-            let dataOwner = res.data.doc;
-            this.ownerPost.cloudinaryID = dataOwner.avatar.cloudinaryID;
-            this.ownerPost.ownerName = dataOwner.userName;
-            this.ownerPost.ownerID = dataOwner._id;
-        })
+        this.ownerPost.cloudinaryID = this.dataPost.owner.avatar.cloudinaryID;
+        this.ownerPost.ownerName = this.dataPost.owner.userName;
+        this.ownerPost.ownerID = this.dataPost.owner._id;
         this.getPagingComment();
+        this.getDifferentDay();
+        this.getReactionOfOwner();
     },
     methods: {
         getPagingComment(){
@@ -200,6 +225,42 @@ export default {
                 //Push thêm data vào listDataPost
                 this.listDataComment = [...this.listDataComment, ...res.data.data.doc];
             })
+        },
+        getReactionOfOwner(){
+            let userInfor = this.$store.getters.userInfor;
+            let lstReact = this.dataPost.react;
+            let reactOfOwner = lstReact.find(x => x.userID == userInfor.userID);
+            if(!reactOfOwner){
+                return;
+            }
+            switch (reactOfOwner.reactType) {
+                case 4:
+                    this.isLike = true;
+                    this.isNoReaction = false;
+                    break;
+                case 6:
+                    this.isLove = true;
+                    this.isNoReaction = false;
+                    break;
+                case 5: 
+                    this.isHaha = true;
+                    this.isNoReaction = false;
+                    break;
+                case 3:
+                    this.isWow = true;
+                    this.isNoReaction = false;
+                    break;
+                case 2: 
+                    this.isSad = true;
+                    this.isNoReaction = false;
+                    break;
+                case 1: 
+                    this.isAngry = true;
+                    this.isNoReaction = false;
+                    break;
+                default:
+                    break;
+            }
         },
         onInput(e) {
             this.$emit('input', e.target.innerText);
@@ -254,6 +315,24 @@ export default {
                 this.isLike = !this.isLike;
                 this.isNoReaction = false;
             }
+
+            let userInfor = this.$store.getters.userInfor;
+            let param = {
+                owner: userInfor.userID,
+                postID: this.dataPost.postID,
+                reactType: 4,          //Click default mặc định là hành động like
+                state: null
+            }
+        
+            if(this.isNoReaction){
+                param.state = State.Delete;
+            }else{
+                param.state = State.Update;
+            }
+            
+            PostAPI.interactivePost(param).then((res) => {
+                console.log(res);
+            })
         },
         /**
          * Click emoticon
@@ -319,6 +398,19 @@ export default {
                 default:
                     break;
             }
+            let userInfor = this.$store.getters.userInfor;
+            let param = {
+                owner: userInfor.userID,
+                postID: this.dataPost.postID,
+                reactType: typeEmoticon,
+                state: null
+            }
+            if(!this.isNoReaction){
+                param.state = State.Update;
+            }
+            PostAPI.interactivePost(param).then((res) => {
+                console.log(res);
+            })
         },
         /**
          * Render preview image
@@ -373,15 +465,49 @@ export default {
         redirectToPersonal(){
             this.$router.push({
                 name: 'Personal',
-                params: { id: this.dataPost.owner }
+                params: { id: this.dataPost.owner._id }
             }).catch(()=>{});
+        },
+        /**
+         * Tính khoảng cách từ thời điểm tạo bài viết đến hiện tại
+         */
+        getDifferentDay(){
+            this.dayOfCreated = CommonFunction.getDayOfTimeWithMinutes(this.dataPost.createdAt, new Date());
+            if(this.dayOfCreated == 0){
+                this.dayOfCreated = "Vừa xong";
+            }
+            if(this.dayOfCreated <= 59){
+                this.dayOfCreated += " phút";
+            }
+            else if(this.dayOfCreated > 59 && this.dayOfCreated <= 1399){
+                this.dayOfCreated = CommonFunction.getDayOfTimeWithHour(this.dataPost.createdAt, new Date());
+                this.dayOfCreated += " giờ";
+            }else if(this.dayOfCreated > 1399){
+                this.dayOfCreated = CommonFunction.getDayOfTimeWithDay(this.dataPost.createdAt, new Date());
+                this.dayOfCreated += " ngày";
+            }
+        },
+        /**
+         * Click ảnh để xem chế độ toàn ảnh
+         */
+        viewFullImage(cloudinaryID){
+            this.showZoomImage = true;
+            this.dataZoomImage = cloudinaryID;
+        },
+        /**
+         * Tắt xem phóng to ảnh
+         */
+        exitDimmed(){
+            this.showZoomImage = false;
         }
+        
     }
 }
 </script>
 <style scoped>
 .posts-box{
-    position: relative;
+    /* position: relative; */
+    position: sticky;
     width: 100%;
     background-color: #ffffff;
     border-radius: 8px;
@@ -452,6 +578,10 @@ export default {
 }
 .posts-box .multiple-img{
     display: flex;
+}
+.posts-box .content-text{
+    white-space: pre-line;
+    text-align: justify;
 }
 .posts-box .content-img{
     width: 100%;

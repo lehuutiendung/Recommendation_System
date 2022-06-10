@@ -39,8 +39,8 @@ export default class BaseAPI {
      * @param {} id 
      * @returns 
      */
-    deleteByID(id){
-        return BaseAPIConfig.delete(`${this.controller}/${id}`);
+    async deleteByID(id){
+        return await BaseAPIConfig.delete(`${this.controller}/${id}`);
     }
 
     /**

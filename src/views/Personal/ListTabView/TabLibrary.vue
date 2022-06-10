@@ -23,7 +23,7 @@
                         <div class="card" v-for="(item, index) in listPostImage" :key="index">
                             <cld-image 
                                 :publicId="item.cloudinaryID" 
-                                loading="lazy">
+                                loading="lazy" @click.native="viewFullImage(item.cloudinaryID)">
                                 <cld-transformation width="auto" gravity="south" crop="fill"/>
                             </cld-image>
                         </div>
@@ -32,23 +32,28 @@
                 </div>
             </div>
         </div>
+        <ZoomImage v-if="showZoomImage" :dataZoomImage="dataZoomImage" @exitDimmed="exitDimmed"></ZoomImage>
     </div>
 </template>
 <script>
 import UserAPI from "@/api/UserAPI.js"
 import Observer from "@/components/observer/Observer.vue"
+import ZoomImage from "@/components/zoom-image/ZoomImage.vue"
 
 export default {
     name: 'TabLibraryPersonal',
     components: {
-        Observer
+        Observer,
+        ZoomImage
     },
     data() {
         return {
             listPostImage: [],      //Danh sách chứa các object hình ảnh {postID, cloudinaryID}
             pageSize: 10,
             pageIndex: 1,
-            totalPage: 0
+            totalPage: 0,
+            showZoomImage: false,
+            dataZoomImage: ""
         }
     },
     created() {
@@ -89,6 +94,19 @@ export default {
             if(this.pageIndex <= this.totalPage){
                 this.getPagingImage();
             }
+        },
+        /**
+         * Click ảnh để xem chế độ toàn ảnh
+         */
+        viewFullImage(cloudinaryID){
+            this.showZoomImage = true;
+            this.dataZoomImage = cloudinaryID;
+        },
+        /**
+         * Tắt xem phóng to ảnh
+         */
+        exitDimmed(){
+            this.showZoomImage = false;
         }
     },
 }

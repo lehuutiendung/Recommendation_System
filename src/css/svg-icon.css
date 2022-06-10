@@ -19,3 +19,9 @@
 	height: 20px;
     -webkit-filter: var(--filter-placeholder-icon);
 }
+.icon-camera{
+    background-image: url(../assets/svg/camera-svgrepo-com.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+}

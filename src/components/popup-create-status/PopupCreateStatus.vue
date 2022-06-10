@@ -73,10 +73,6 @@ export default {
         statePopup:{
             type: Number,
             default: 0,
-        },
-        avatar:{
-            type: Object,
-            deafult: {}
         }
     },
     data() {
@@ -86,7 +82,12 @@ export default {
             images: [],                 //Danh sách các file được chọn (ListFile) (Data call api)
             imgSrc : null,              //Source base 64 của hình ảnh
             isShowLoader: false,
+            avatar: {}
         }
+    },
+    created() {
+        let userInfor = this.$store.getters.userInfor;
+        this.avatar = userInfor.avatar;
     },
     computed: {
         listeners() {

@@ -3,24 +3,26 @@
         <div class="about-group">
             <div class="title">{{ $t('i18nGroup.TabGeneral.IntroduceGroup') }}</div>
             <div class="general">{{ dataGroup.general }}</div>
-            <div class="privacy m-t-10">
-                <div class="fb-icon-private"></div>
-                <div class="content-privacy">
-                    <div class="type-privacy">{{ $t('i18nGroup.TabGeneral.Private') }}</div>
-                    <div>{{ $t('i18nGroup.TabGeneral.PrivateRule') }}</div>
-                </div>
-            </div>
         </div>
         <div class="about-group">
             <div class="title">{{ $t('i18nGroup.TabGeneral.MemberGroup') }}</div>
             <div class="general">{{ totalMember }} thành viên</div>
             <div class="admin-overview m-t-10">
-                <div class="icon-32 icon-avatar"></div>
+                <div class="icon-32 icon-avatar">
+                    <cld-image
+                        :publicId="adminGroup.avatar.cloudinaryID">
+                        <cld-transformation gravity="south" crop="fill"/>
+                    </cld-image>
+                </div>
                 <div class="name-item p-l-10">
-                    <div class="username">Lê Hữu Tiến Dũng là {{ $t('i18nGroup.TabGeneral.Admin') }}</div>
+                    <div class="username">{{ adminGroup.userName }} {{ $t('i18nGroup.TabGeneral.Admin') }}</div>
                 </div>
             </div>
             <div class="view-more-member">{{ $t('i18nGroup.TabGeneral.ViewMoreMember') }}</div>
+        </div>
+        <div class="about-group out-group" v-if="userJoined" @click="handleOutGroup">
+            <div v-if="isOwner">Xóa nhóm</div>
+            <div v-if="!isOwner">Rời nhóm</div>
         </div>
     </div>
 </template>
@@ -28,17 +30,54 @@
 import GroupAPI from "@/api/GroupAPI.js"
 export default {
     name: 'TabGeneralGroup',
+    props:{
+        userJoined: {
+            type: Boolean,
+            default: false
+        }
+    },
     data() {
         return {
             dataGroup: {},
+            adminGroup: {
+                avatar: {
+                    cloudinaryID: "",
+                }
+            },
             totalMember: 0,
+            isOwner: false,
         }
     },
     created() {
         GroupAPI.getByID(this.$route.params.id).then((res) => {
-            this.dataGroup = res.data.doc;
-            this.totalMember = this.dataGroup.members.length + 1;
+            if(res.data && res.data.success){
+                this.dataGroup = res.data.doc;
+                this.adminGroup = this.dataGroup.admin;
+                this.totalMember = this.dataGroup.members.length;
+                if(this.adminGroup._id == this.$cookie.get("u_id")){
+                    this.isOwner = true;
+                }
+            }
         })
+    },
+    methods: {
+        handleOutGroup(){
+            // Xóa nhóm
+            if(this.isOwner){
+                GroupAPI.deleteByID(this.dataGroup._id);
+                
+            }else{
+                // Rời nhóm
+                let dataRequest = {
+                    groupID: this.dataGroup._id,
+                    userID: this.$cookie.get("u_id")
+                }
+                GroupAPI.outGroup(dataRequest);
+            }
+            this.$router.push({
+                name: 'OverviewGroup'
+            }).catch(()=>{});
+        }
     },
 }
 </script>
@@ -61,17 +100,6 @@ export default {
             border-bottom: 1px solid #cccccc;
             margin-bottom: 10px;
         }
-        .privacy{
-            display: flex;
-            .content-privacy{
-                width: fit-content;
-                padding-left: 10px;
-            }
-            .type-privacy{
-                font-size: 16px;
-                font-weight: 450;
-            }
-        }
         .admin-overview{
             display: flex;
             align-items: center;
@@ -84,6 +112,16 @@ export default {
         .view-more-member:hover{
             text-decoration: underline;
         }
+    }
+    .out-group{
+        display: flex;
+        justify-content: center;
+        color: red;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    .out-group:hover{
+        background-color: #fdf4f4;
     }
 }    
 </style>

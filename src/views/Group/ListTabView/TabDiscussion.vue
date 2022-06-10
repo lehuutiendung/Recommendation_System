@@ -3,7 +3,12 @@
         <!-- Bạn muốn chia sẻ điều gì? -->
         <div class="box-status">
             <div class="wrap-content flex">
-                <div class="icon-40 icon-avatar"></div>
+                <div class="icon-40 icon-avatar">
+                    <cld-image 
+                        :publicId="avatar.cloudinaryID">
+                        <cld-transformation gravity="south" crop="fill"/>
+                    </cld-image>
+                </div>
                 <div class="ask-content" @click="showPopupPost">{{ $t('i18nNewsFeed.BoxCreatePost.AskContent') }}</div>
             </div>
             <div class="wrap-active flex">
@@ -18,7 +23,7 @@
             </div>
         </div>
         <div class="wrap-posts" v-for="item in listDataPost" :key="item._id">
-            <PostsBox :userID="userID" :dataPost="item" :showInfoGroup="false" @deletePost="deletePost" @forwardData="forwardData"/>
+            <PostsBox :userID="userID" :avatar="avatar" :dataPost="item" :showInfoGroup="false" @deletePost="deletePost" @forwardData="forwardData"/>
         </div>
         <Observer @getPaging="getPagingData"/>
         <PopupCreateStatus v-if="isShowStatus" 
@@ -55,10 +60,13 @@ export default {
             totalPage: 0,               //Tổng số bản ghi
             userID: "",
             groupID: "",
+            avatar: "",
         }
     },
     created() {
         this.groupID = this.$route.params.id;
+        let userInfor = this.$store.getters.userInfor;
+        this.avatar = userInfor.avatar;
     },
     mounted() {
         this.userID = this.$cookie.get('u_id');

@@ -1,13 +1,14 @@
 <template>
   <div id="app">
-    <header-app v-if="showHeader"></header-app>
+    <header-app v-if="showHeader" @logout="hideHeader"></header-app>
     <router-view :key="$route.fullPath"></router-view>
   </div>
 </template>
 
 <script>
-import {EventBus} from "./main"
-import HeaderApp from "@/components/header-app/HeaderApp.vue"
+import {EventBus} from "./main";
+import HeaderApp from "@/components/header-app/HeaderApp.vue";
+
 export default {
   name: 'App',
   components: {
@@ -34,6 +35,18 @@ export default {
     this.$socket.on("get_notification", (data) => {
         EventBus.$emit('notification_addfriend', data);
     })
+  },
+  methods:{
+    /**
+     * Đăng xuất
+     */
+    hideHeader(){
+      this.$cookie.delete('jwtToken');
+      this.$cookie.delete('u_id');
+      this.$cookie.delete('u_name');
+      this.showHeader = false;
+      this.$router.push('/login');
+    }
   },
   watch:{
     jwt: function(){

@@ -15,7 +15,7 @@
                 <div class="grid-2-col">
                     <div class="item">  
                         <div class="label-item">Họ và tên</div>
-                        <Input :stateView="stateView" v-model="userData.userName" :valueInput="userData.userName"/>
+                        <Input :stateView="stateView" v-model="userData.userName"/>
                     </div>
                     <div class="item">  
                         <div class="label-item">Dân tộc</div>
@@ -81,6 +81,7 @@ import Input from "@/components/input/BaseInput.vue";
 import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import UserAPI from "@/api/UserAPI.js"
 import moment from "moment"
+import {EventBus} from "../../../main"
 
 export default {
     name: 'TabAboutPersonal',
@@ -95,23 +96,41 @@ export default {
         }
     },
     created() {
-        this.getUserData();
+        let userInfor = this.$store.getters.userInfor;
+        if(userInfor){
+            this.userData = userInfor;
+            // Chuyển đổi enum => loại giới tính
+            if(this.userData.gender == 0){
+                this.userData.genderName = "Nam";
+            }else if(this.userData.gender == 1){
+                this.userData.genderName = "Nữ";
+            }else{
+                this.userData.genderName = "Khác";
+            }
+            // Chuyển đổi ngày tháng DD/MM/YYYY
+            this.userData.dateOfBirthConverted = this.convertDateVN(this.userData.dateOfBirth);
+        }else{
+            this.getUserData();
+        }   
     },
     methods: {
         //Call API lấy thông tin của người dùng
         getUserData(){
             UserAPI.getByID(this.$route.params.id).then( (res) => {
-                this.userData = res.data.doc;
-                // Chuyển đổi enum => loại giới tính
-                if(this.userData.gender == 0){
-                    this.userData.genderName = "Nam";
-                }else if(this.userData.gender == 1){
-                    this.userData.genderName = "Nữ";
-                }else{
-                    this.userData.genderName = "Khác";
+                if(res && res.data.Success){
+                    this.userData = res.data.doc;
+                    this.$store.dispatch('updateUserInfor', res.data.doc);
+                    // Chuyển đổi enum => loại giới tính
+                    if(this.userData.gender == 0){
+                        this.userData.genderName = "Nam";
+                    }else if(this.userData.gender == 1){
+                        this.userData.genderName = "Nữ";
+                    }else{
+                        this.userData.genderName = "Khác";
+                    }
+                    // Chuyển đổi ngày tháng DD/MM/YYYY
+                    this.userData.dateOfBirthConverted = this.convertDateVN(this.userData.dateOfBirth);
                 }
-                // Chuyển đổi ngày tháng DD/MM/YYYY
-                this.userData.dateOfBirthConverted = this.convertDateVN(this.userData.dateOfBirth);
             })
         },
         //Click button cập nhật thông tin
@@ -136,10 +155,13 @@ export default {
                 religion: this.userData.religion,
                 nationality: this.userData.nationality
             }
-            UserAPI.update(this.$route.params.id, newDataUser).then( () => {
+            UserAPI.update(this.$route.params.id, newDataUser).then( async () => {
                 this.stateView = true;
+                // TODO: Bất đồng bộ dispatch trước khi gọi update userName HeaderApp
                 this.getUserData();
+                EventBus.$emit('updateInfor', true);
             })
+            // Emit sự kiện cập nhật lại userName HeaderApp từ Vuex (userInfor)
         },
         /**
          * Convert định dạng ngày tháng Việt Nam

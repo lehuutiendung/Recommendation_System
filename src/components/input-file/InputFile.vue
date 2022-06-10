@@ -1,12 +1,48 @@
 <template>
     <div class="wrapper">
-        <input id="file" type="file" accept=".jpg, .jpeg, .png, .gif" @change="onFileChange" >
-        <label for="file">Chọn hình ảnh</label>
+        <input :id="indexFile" type="file" accept=".jpg, .jpeg, .png, .gif" @change="onFileChange" :style="style">
+        <label :for="indexFile" :style="style">{{label}}</label>
     </div>
 </template>
 <script>
 export default {
     name: 'InputFile',
+    props:{
+      color: {
+        type: String,
+        default: "#f15d22"
+      },
+      textcolor:{
+        type: String,
+        default: "#fff"
+      },
+      hovercolor:{
+        type: String,
+        default: "#f04806"
+      },
+      padding: {
+        type: String,
+        default: "1rem 50px"
+      },
+      label:{
+        type: String,
+        default: "Chọn hình ảnh"
+      },
+      indexFile:{
+        type: String,
+        default: ""
+      }
+    },
+    data() {
+      return {
+        style:{
+          '--color': this.color,
+          '--textcolor': this.textcolor,
+          '--hovercolor': this.hovercolor,
+          '--padding': this.padding,
+        }
+      }
+    },
     methods: {
         /**
          * Render preview image
@@ -31,23 +67,26 @@ export default {
 }
 
 [type="file"] + label {
-  background: #f15d22;
+  background: var(--color);
   border: none;
   border-radius: 5px;
-  color: #fff;
+  color: var(--textcolor);
   cursor: pointer;
   display: inline-block;
-  font-size: inherit;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 450;
   outline: none;
-  padding: 1rem 50px;
+  padding: var(--padding);
   position: relative;
   transition: all 0.3s;
   vertical-align: middle;
   width: 100%;
   text-align: center;
+  transition: opacity .25s ease-in-out;
+  -moz-transition: opacity .25s ease-in-out;
+  -webkit-transition: opacity .25s ease-in-out;
   &:hover {
-    background-color: darken(#f15d22, 10%);
+    background-color: var(--hovercolor)!important;
   }
 }
 

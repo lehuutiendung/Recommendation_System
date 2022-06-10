@@ -14,7 +14,12 @@
                 <div class="box-result-search" v-if="inputSearch && showResultSearch">
                     <div class="result">
                         <div class="item-result" v-for="(item,index) in listResultSearch" :key="index" @click="redirectToPersonal(item._id)">
-                            <div class="icon-32 icon-avatar"></div>
+                            <div class="icon-32 icon-avatar">
+                                <cld-image 
+                                    class="avatar-user"
+                                    :publicId="item.avatar.cloudinaryID">
+                                </cld-image>
+                            </div>
                             <div class="m-l-10 username">{{ item.userName }}</div>
                         </div>
                     </div>
@@ -34,9 +39,11 @@
                     <div class="username">{{ userName }}</div>
                 </div>
             </div>
+            <!-- Tin nhắn -->
             <div class="icon-40 button-icon">
                 <div class="icon-20 icon-message-noti"></div>
             </div>
+            <!-- Thông báo ứng dụng -->
             <div class="icon-40 button-icon" @click="showPopupNotify" v-click-outside="hidePopupNotify">
                 <div class="icon-20 icon-notify"></div>
                 <div class="number-noti" v-if="listNotification.length > 0">{{ listNotification.length }}</div>
@@ -60,6 +67,10 @@
                         </div>
                     </div>
                 </div>
+            </div>
+            <!-- Đăng xuất -->
+            <div class="icon-40 button-icon" @click="handleLogOut">
+                <div class="icon-20 icon-log-out"></div>
             </div>
         </div>
     </div>
@@ -98,9 +109,9 @@ export default {
             avatar: "",                     //Avatar user
         }
     },
-    created() {
-        this.userName = this.$cookie.get('u_name');
+    async created() {
         this.userID = this.$cookie.get('u_id');
+        await this.getCurrentUser(this.userID);
         //Lấy thông báo lần đầu khởi tạo HeaderApp
         if(this.$cookie.get('jwtToken')){
             let query = {
@@ -112,22 +123,39 @@ export default {
             }).then((res) => {
                 this.listNotification = res.data.dataRes;
             })
-
-            //Lấy avatar của người dùng
-            axios.get(ConfigApiEnum.URL_API + `users/${this.$cookie.get('u_id')}`,
-            {
-                headers: this.headers, 
-            }).then((res) => {
-                this.avatar = res.data.doc.avatar;
-            })
         }
     },
     mounted() {
         EventBus.$on('notification_addfriend', (data) =>  {
             this.listNotification.push(data);
         })
+
+        EventBus.$on('updateInfor', () => {
+            console.log("update name");
+            this.userName = this.$store.getters.userInfor.userName;
+
+        })
     },
     methods: {
+        /**
+         * Lấy thông tin user hiện tại
+         */
+        getCurrentUser(userID){
+            try {
+                axios.get(ConfigApiEnum.URL_API + `users/${userID}`,
+                {
+                    headers: this.headers, 
+                }).then((res) => {
+                    if(res && res.data.Success){
+                        this.avatar = res.data.doc.avatar;
+                        this.userName = res.data.doc.userName;
+                        this.$store.dispatch('updateUserInfor', res.data.doc);
+                    }
+                })
+            } catch (error) {
+                console.log(error);
+            }
+        },
         /**
          * Chuyển hướng đến trang cá nhân
          */
@@ -201,7 +229,16 @@ export default {
             }).then(() => {
                 this.listNotification = this.listNotification.filter(x => x.id !== noti.id);
             })
+        },
+        /**
+         * Xử lý sự kiện đăng xuất. emit tới App.vue
+         */
+        handleLogOut(){
+            this.$emit("logout", true);
         }
+    },
+    beforeDestroy() {
+        // this.EventBus.$off('display-notification');
     },
 }
 </script>

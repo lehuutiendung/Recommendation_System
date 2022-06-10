@@ -68,6 +68,7 @@
 /* Left-bar */
 .overview .left-bar{
     width: var(--sidebarLeft-width);
+    height: 100vh;
     background-color: var(--background-app);
     overflow: hidden;
     overflow-y: scroll;
@@ -95,10 +96,15 @@ margin-left: 10px;
 .icon-message-noti{
     background: url(../../../assets/svg/feedback-svgrepo-com.svg);
     background-size: contain;
-    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%)
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
 }
 .icon-notify{
     background-image: url(../../../assets/svg/bell-alert-svgrepo-com.svg);
     background-size: contain;
-    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%)
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
+}
+.icon-log-out{
+    background-image: url(../../../assets/svg/log-out.svg);
+    background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
 }
