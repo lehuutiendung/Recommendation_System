@@ -3,6 +3,8 @@ export default{
         LoadMore: "Xem thêm các nhóm",
         TitleSuggest: "Gợi ý nhóm cho bạn",
         ContentSuggest: "Nhóm mà bạn có thể quan tâm",
+        RequestJoinGroup: "Tham gia nhóm",
+        JoinGroup: "Truy cập"
     },
     AddGroup:{
         CreateGroup: "Tạo nhóm",

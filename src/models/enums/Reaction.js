@@ -1,8 +1,8 @@
 export const Reaction = {
-    Like: 1,
-    Love: 2,
-    Haha: 3,
-    Wow: 4,
-    Sad: 5,
-    Angry: 6
+    Like: 4,
+    Love: 6,
+    Haha: 5,
+    Wow: 3,
+    Sad: 2,
+    Angry: 1
 }

@@ -40,7 +40,7 @@ export default {
     created() {
         GroupAPI.getByID(this.$route.params.id).then((res) => {
             this.dataGroup = res.data.doc;
-            this.totalMember = this.dataGroup.members.length + 1;
+            this.totalMember = this.dataGroup.members.length;
         })
     },
 }

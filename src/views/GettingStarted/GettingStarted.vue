@@ -27,8 +27,8 @@
                         <div class="content-noti">Đăng ký tài khoản thành công.</div>
                     </div>    
                     <div class="title">VISONET</div>
-                    <input class="input-login" v-model="email" type="text" placeholder="Email">
-                    <input class="input-login" v-model="password" type="password" placeholder="Mật khẩu">
+                    <input class="input-login" v-model="email" type="text" placeholder="Email" v-on:keyup.enter="clickLogin">
+                    <input class="input-login" v-model="password" type="password" placeholder="Mật khẩu" v-on:keyup.enter="clickLogin">
                     <div class="text-noti" v-if="accoutNotFound">Tài khoản này không tồn tại.</div>
                     <div class="text-noti" v-if="accoutWrong">Mật khẩu không đúng.</div>
                     <div class="button-login" @click="clickLogin">Đăng nhập</div>
@@ -44,6 +44,7 @@
 import axios from "axios";
 import PopupRegister from "@/views/GettingStarted/PopupRegister.vue"
 import {EventBus} from "../../main"
+
 export default {
     name: 'GettingStarted',
     components:{
@@ -57,7 +58,8 @@ export default {
             email: "",
             password: "",
             accoutNotFound: false,  //Không tìm thấy tài khoản
-            accoutWrong: false,     //Sai tài khoản
+            accoutWrong: false,     //Sai tài khoản,
+            userID: "",
         }
     },
     methods: {
@@ -96,11 +98,13 @@ export default {
                 this.$cookie.set('jwtToken', res.data.accessToken, { expires: '1D' });
                 this.$cookie.set('u_id', res.data.id, {expires: '1D'});
                 this.$cookie.set('u_name', res.data.userName, {expires: '1D'});
+                this.userID = res.data.id;
+                this.$store.dispatch('updateUserInfor', res.data);
             }).then(() => {
                 EventBus.$emit('showHeaderApp');
                 this.$router.push('/');
                 // Bắn socket chứa userID khi user online
-                this.$socket.emit('user-online', this.$cookie.get('u_id'));
+                this.$socket.emit('user-online', this.userID);
             })
             .catch(err => {
                 if(err.response.status == 404){

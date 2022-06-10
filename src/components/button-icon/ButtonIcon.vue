@@ -1,5 +1,5 @@
 <template>
-    <div class="button-icon" :class="{ 'disable': disable , 'btn-color-white': btnWhite }" :style="{'width': width + 'px' , 'height' : height + 'px' }">
+    <div class="button-icon" :class="[disableClass, colorClass]" :style="{'width': width + 'px' , 'height' : height + 'px', 'border-radius' : border_radius + 'px'}">
         <div class="fb" :class="icon"></div>
         <div class="wrap-text">{{ text }}</div>
     </div>
@@ -35,6 +35,12 @@ export default {
         color:{
             type: String,
             default: ""
+        }
+    },
+    data() {
+        return {
+            disableClass: this.disable,
+            colorClass: this.color
         }
     },
     computed:{
@@ -77,14 +83,27 @@ export default {
     background-color: #E4E6EB;
     cursor: not-allowed;
 }
-.btn-color-white{
+
+// Màu
+.white{
     background-color: #e3e5eb !important;
     color: #050505 !important;
 }
-.btn-color-white:hover{
+.white:hover{
     background-color: #D8DADF !important;
 }
-.btn-color-white:active{
+.white:active{
     background-color: #e3e5eb !important;
 }
+.light-blue{
+    background-color: var(--light-blue) !important;
+    color: #1877F2;
+}
+.light-blue:hover{
+    background-color: #7abaff !important;
+}
+.light-blue:active{
+    background-color: var(--light-blue) !important;
+}
+
 </style>

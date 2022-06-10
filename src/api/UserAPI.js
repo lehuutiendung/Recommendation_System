@@ -56,5 +56,21 @@ class UserAPI extends BaseAPI{
     filterUser(data){
         return BaseAPIConfig.post(`${this.controller}/filter-user`, data);
     }
+    /**
+     * Cập nhật avatar
+     * @param {*} id 
+     * @param {*} data 
+     */
+    changeAvatar(id,data){
+        return BaseAPIConfig.put(`${this.controller}/avatar/${id}`, data); 
+    }
+    /**
+     * Cập nhật avatar
+     * @param {*} id 
+     * @param {*} data 
+     */
+     changeBackground(id,data){
+        return BaseAPIConfig.put(`${this.controller}/background/${id}`, data); 
+    }
 }
 export default new UserAPI();

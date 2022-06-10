@@ -1,4 +1,6 @@
 export default  {
+    ChangeAvatar: "Cập nhật ảnh đại diện",
+    ChangeBackground: "Cập nhật ảnh bìa",
     TabTimeline: {
         About: "Giới thiệu",
         Friend: "Bạn bè",

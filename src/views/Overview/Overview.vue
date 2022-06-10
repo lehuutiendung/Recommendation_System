@@ -1,25 +1,5 @@
 <template>
     <div class="overview">
-        <!-- <div class="header">
-            <router-link to="/" class="icon-app">
-            </router-link>
-            <div class="group-header">
-                <div class="wrap-avatar-username" @click="redirectToPersonal">
-                    <div class="avatar-username flex">
-                        <div class="icon-32 icon-avatar"></div>
-                        <div class="username">{{ userName }}</div>
-                    </div>
-                </div>
-                <div class="icon-40 button-icon">
-                    <div class="icon-20 icon-message-noti"></div>
-                </div>
-                <div class="icon-40 button-icon">
-                    <div class="icon-20 icon-notify"></div>
-                    <div class="number-noti" v-if="listNotification.length > 0">{{ listNotification.length }}</div>
-                </div>
-            </div>
-        </div> -->
-        
         <div class="content" :style="{'padding-top' : paddingTopContent + 'px'}">
             <div class="pre-content" v-if="showPreContent">
                 <slot name="pre-content"></slot>
@@ -47,7 +27,6 @@
 <script>
 import SidebarLeft from "@/components/sidebar/SidebarLeft.vue"
 import SidebarRight from "@/components/sidebar/SidebarRight.vue"
-import UserAPI from "@/api/UserAPI.js";
 export default {
     name: 'Overview',
     components:{
@@ -82,10 +61,9 @@ export default {
         }
     },
     created() {
-        this.userName = this.$cookie.get('u_name');
-        UserAPI.getByID(this.$cookie.get('u_id')).then((res) => {
-            this.avatar = res.data.doc.avatar;
-        })
+        let userInfor = this.$store.getters.userInfor;
+        this.userName = userInfor.userName;
+        this.avatar = userInfor.avatar;
     },
     methods: {
         /**

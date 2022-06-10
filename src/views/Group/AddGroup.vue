@@ -7,13 +7,13 @@
                     <div class="wrap-item mg-b-10">
                         <div class="icon-40 icon-avatar"></div>
                         <div class="name-item">
-                            <div class="username">Lê Hữu Tiến Dũng</div>
+                            <div class="username">{{ userNameAccount }}</div>
                             <div class="admin">{{ $t('i18nGroup.AddGroup.Admin' )}}</div>
                         </div>
                     </div>
                     <Input class="m-b-14" label="Tên nhóm" :required="true" :maxlength="255" :autoFocus="true" v-model="groupName"/>
                     <Input class="m-b-20" label="Thông tin chung" v-model="generalGroup" :maxlength="1000"/>
-                    <InputFile class="m-b-20" @getDataImage="getDataImage"/>
+                    <InputFile class="m-b-20" indexFile="add-group" @getDataImage="getDataImage"/>
                     <Button text="Tạo" Width="100%" :Height="44" :border_radius="5" :disable=" groupName ? false : true" @click.native="handleCreateGroup"/>
                 </div>
             </template>
@@ -57,7 +57,12 @@ export default {
                 type: File,
             },
             generalGroup: "",           //Thông tin chung group
+            userNameAccount: "",
         }
+    },
+    created() {
+        this.userNameAccount = this.$cookie.get('u_name');
+        console.log(this.userNameAccount);
     },
     methods: {
         /**

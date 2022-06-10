@@ -5,7 +5,7 @@
                 <div class="header-group">
                     <div class="background">
                         <cld-image 
-                            :publicId="dataGroup.background ? dataGroup.background.cloudinaryID : imageDefault" 
+                            :publicId="background ? background : imageDefault" 
                             loading="lazy">
                             <cld-transformation width="auto" gravity="south" crop="fill"/>
                         </cld-image>
@@ -13,14 +13,14 @@
                     <div class="block-name">
                         <div class="group-name">{{ dataGroup.name }}</div>
                         <div class="flex">
-                            <div class="privacy-group icon-private m-r-10"></div>
-                            <div class="private-group">Nhóm riêng tư</div>
-                            <span class="m-l-10 m-r-10">.</span>
                             <div class="members-default">{{ totalMember }} thành viên</div>
                         </div>
                         <div class="flex-end">
-                            <ButtonText text="Đã tham gia"/>
-                            <ButtonIcon text="Mời" icon="fb-icon-add"/>
+                            <!-- TODO: Xu ly su kien click da tham gia  -> Roi nhom -->
+                            <ButtonText text="Đã tham gia" v-if="userJoined"/>
+                            <!-- TODO: Xu ly su kien click tham gia -> Tham gia nhom -->
+                            <ButtonText text="Tham gia" v-if="!userJoined"/>
+                            <ButtonIcon text="Mời" icon="fb-icon-add" v-if="userJoined"/>
                         </div>
                         <div class="wrap-header-item">
                             <div class="tab-item" v-for="(tab, index) in listTab" :key="index" @click="changeTab(index)">
@@ -36,7 +36,7 @@
             </template>
             <template v-slot:center>
                 <div class="center">
-                    <router-view></router-view>
+                    <router-view :userJoined="userJoined"></router-view>
                 </div>
             </template>
             <template v-slot:right-bar>
@@ -61,6 +61,7 @@ export default {
         return {
             imageDefault: "Image Default/groups-default-cover-photo-2x_k8zc6f",
             dataGroup: {},
+            background: "",
             totalMember: 0,
             listTab:[
                 {
@@ -74,14 +75,23 @@ export default {
                 }
             ],
             currentTab: 0,              //Tab giới thiệu
+            listMember: [],
+            userJoined: false,
         }
     },
     created() {
         this.detectActiveTab();
         GroupAPI.getByID(this.$route.params.id).then((res) => {
-            this.dataGroup = res.data.doc;
-            this.totalMember = this.dataGroup.members.length + 1;
+            if(res.data && res.data.success){
+                this.dataGroup = res.data.doc;
+                this.totalMember = this.dataGroup.members.length;
+                this.background = this.dataGroup.background.cloudinaryID;
+                this.listMember = this.dataGroup.members;
+                // Check người dùng đã tham gia nhóm hay chưa
+                this.userJoined = this.listMember.includes(this.$cookie.get("u_id"));
+            }
         })
+        
     },
     methods: {
         /**
@@ -161,22 +171,6 @@ export default {
                 font-size: 26px;
                 font-weight: 700;
                 color: #BCC0C4;
-            }
-            .privacy-group{
-                background-image: url(https://www.facebook.com/rsrc.php/v3/yh/r/JFz-Mva7-Bh.png);
-                background-size: auto;
-                width: 12px;
-                height: 12px;
-                background-repeat: no-repeat;
-                display: inline-block;
-                -webkit-filter: var(--filter-secondary-icon);
-            }
-            .icon-private{
-                background-position: 0px -583px;
-            }
-            .private-group{
-                font-size: 18px;
-                color: #606770;
             }
             .members-default{
                 font-size: 18px;

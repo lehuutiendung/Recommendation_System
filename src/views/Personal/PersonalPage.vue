@@ -3,13 +3,58 @@
         <Overview :showPreContent="true" :showLeftBar="false" :showRightBar="false" :paddingTopContent="0">
             <template v-slot:pre-content>
                 <div class="header-user">
-                    <div class="background"><img src="../../assets/groups-default-cover-photo-2x.png" alt=""></div>
+                    <div class="background">
+                        <img :src="previewBackground" alt="" v-if="previewBackground">
+                        <!-- <img src="../../assets/groups-default-cover-photo-2x.png" alt="" v-else> -->
+                        <cld-image 
+                            class=""
+                            :publicId="dataUser.background.cloudinaryID" loading="lazy" v-else>
+                            <cld-transformation gravity="south" crop="fill"/>
+                        </cld-image>
+                        <ButtonIcon 
+                        v-if="isMyPage && previewAvatar == '' && previewBackground == ''"
+                        class="btn-update-image" 
+                        text="Cập nhật ảnh" 
+                        width="auto" 
+                        color="white" 
+                        icon="icon-camera" @click.native="openDropdown"/>
+                    </div>
+                    <div class="popup-option" v-if="isShowOption">
+                        <InputFile 
+                        color="#ffffff" 
+                        textcolor="#000000" 
+                        hovercolor="#e2e7ec" 
+                        padding="10px" 
+                        label="Cập nhật ảnh đại diện"
+                        indexFile="avatar"
+                        @getDataImage="getDataImageAvatar"/>
+
+                        <InputFile 
+                        color="#ffffff" 
+                        textcolor="#000000" 
+                        hovercolor="#e2e7ec" 
+                        padding="10px" 
+                        label="Cập nhật ảnh bìa" 
+                        indexFile="background"
+                        @getDataImage="getDataImageBackground"/>
+                        
+                    </div>
                     <div class="block-user">
                         <div class="avatar">
-                            <img class="avatar-user" src="../../assets/Avatar.jpg" alt="">
+                            <img class="avatar-user" :src="previewAvatar" alt="" v-if="previewAvatar">
+                            <cld-image 
+                                class="avatar-user"
+                                :publicId="dataUser.avatar.cloudinaryID" loading="lazy" v-else>
+                                <cld-transformation gravity="south" crop="fill"/>
+                            </cld-image>
                         </div>
                         <div class="info-name">
                             <div class="user-name">{{ dataUser.userName }}</div>    
+                            <div class="flex-end" v-if="isMyPage && file != null">
+                                <ButtonIcon :text="$t('i18nCommon.Cancel')" width="auto" color="white" @click.native="clickCancel"/>
+                                <ButtonIcon :text="$t('i18nCommon.Save')" width="auto" color="blue" @click.native="clickSave"/>
+                            </div>
+
                             <ButtonIcon class="btn-addfriend" text="Thêm bạn bè" width="auto" icon="fb-icon-addfr" v-if="!isFriend && userID != ownerID" @click.native="requestAddFriend"/>
                             <ButtonIcon class="btn-addfriend" text="Bạn bè" width="auto" color="white" icon="fb-icon-isFriend" v-if="isFriend"/>
                         </div>
@@ -35,34 +80,66 @@ import Overview from "@/views/Overview/Overview.vue"
 import UserAPI from "@/api/UserAPI.js"
 import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import {Notification} from "@/models/enums/Notification.js"
+import ClickOutSide from "@/mixins/detectoutside.js"
+const InputFile = () => import("@/components/input-file/InputFile.vue")
+const TabAbout = () => import("@/views/Personal/ListTabView/TabAbout.vue")
+const TabFriend = () => import("@/views/Personal/ListTabView/TabAbout.vue")
+const TabLibrary = () => import("@/views/Personal/ListTabView/TabAbout.vue")
+import TabTimeline from "@/views/Personal/ListTabView/TabAbout.vue"
+
 export default {
     name: 'PersonalPage',
+    directives: {
+        ClickOutSide
+    },
     components:{
         Overview,
-        ButtonIcon
+        ButtonIcon,
+        InputFile,
     },
     data() {
         return {
-            dataUser: {},
+            dataUser: {
+                avatar: {
+                    cloudinaryID: "",
+                },
+                background: {
+                    cloudinaryID: "",
+                }
+            },
             userID: "",
             ownerID: "",
             listTab:[
                 {
-                    titleTab: 'Dòng thời gian'
+                    titleTab: 'Dòng thời gian',
+                    tabKey: 1,
+                    component: TabTimeline
                 },
                 {
-                    titleTab: 'Giới thiệu'
+                    titleTab: 'Giới thiệu',
+                    tabKey: 2,
+                    component: TabAbout
                 },
                 {
-                    titleTab: 'Hình ảnh'
+                    titleTab: 'Hình ảnh',
+                    tabKey: 3,
+                    component: TabLibrary
                 },
                 {
-                    titleTab: 'Bạn bè'
+                    titleTab: 'Bạn bè',
+                    tabKey: 4,
+                    component: TabFriend
                 }
             ],
             currentTab: 0,              //Tab dòng thời gian
             listFriendOwner: [],        //Danh sách bạn bè của người dùng account hiện tại
             isFriend: null,
+            isShowOption: false,
+            previewAvatar: "",          //base64 preview avatar
+            previewBackground: "",      //base64 preview background
+            file: null,
+            typeChangeImage: null,      // 0: Thay đổi ảnh đại diện - 1: thay đổi ảnh bìa
+            isMyPage: false,
         }
     },   
     created() {
@@ -141,7 +218,6 @@ export default {
                     break;
             }
         },
-        // TODO:
         /**
          * Gửi yêu cầu kết bạn
          */
@@ -171,7 +247,66 @@ export default {
             }else{
                 return true;
             }
+        },
+        /**
+         * Click button cập nhật ảnh mở dropdown
+         */
+        openDropdown(){
+            this.isShowOption = !this.isShowOption;
+        },
+        /**
+         * Nhận emit thay đổi từ input file
+         */
+        getDataImageAvatar(file, preview){
+            this.typeChangeImage = 0;
+            this.file = file;
+            if(this.typeChangeImage == 0){
+                this.previewAvatar = preview;
+            }else{
+                this.previewBackground = preview;
+            }
+            this.isShowOption = false;
+        },
+        getDataImageBackground(file, preview){
+            this.typeChangeImage = 1;
+            this.file = file;
+            if(this.typeChangeImage == 0){
+                this.previewAvatar = preview;
+            }else{
+                this.previewBackground = preview;
+            }
+            this.isShowOption = false;
+        },
+        /**
+         * Click hủy cập nhật avatar, background
+         */
+        clickCancel(){
+            this.file = null;
+            this.previewAvatar = "";
+            this.previewBackground = "";
+        },
+        /**
+         * Click lưu cập nhật avatar, background
+         */
+        clickSave(){
+            let formData = new FormData();
+            if(this.previewAvatar != ""){
+                formData.append("avatar", this.file);
+                UserAPI.changeAvatar(this.ownerID, formData).then( res => {
+                    if(res.data && res.data.success){
+                        this.file = null;
+                    }
+                });
+            }else{
+                formData.append("background", this.file);
+                UserAPI.changeBackground(this.ownerID, formData).then( res => {
+                    if(res.data && res.data.success){
+                        this.file = null;
+                    }
+                });
+            }
         }
+
     },
     watch:{
         // Cập nhật thông tin khi thay đổi trang cá nhân 
@@ -179,6 +314,12 @@ export default {
             handler: function(userIDCurrent) {
                 if(this.userID != userIDCurrent){
                     this.getInfoUser();
+                }
+                let myID = this.$store.getters.userInfor._id;
+                if(userIDCurrent == myID){
+                    this.isMyPage = true;
+                }else{
+                    this.isMyPage = false;
                 }
             },
             deep: true,
@@ -190,8 +331,10 @@ export default {
 <style lang="scss" scoped>
 .personal{
     .header-user{
+        position: relative;
         background-color: #ffffff;
         .background{
+            position: relative;
             width: 100%;
             height: 350px;
             display: flex;
@@ -204,6 +347,11 @@ export default {
                 object-fit: cover;
                 border-bottom-left-radius: 8px;
                 border-bottom-right-radius: 8px;
+            }
+            .btn-update-image{
+                position: absolute;
+                right: 16%;
+                bottom: 10px;
             }
         }
         .block-user{
@@ -279,5 +427,16 @@ export default {
             }
         }
     }
+}
+.header-user .popup-option{
+    position: absolute;
+    right: 16%;
+    bottom: 22%;
+    padding: 4px;
+    background-color: #ffffff;
+    box-shadow: 0 0 2px 0 rgb(0 0 0 / 50%);
+    border-radius: 4px;
+    font-weight: 500;
+    z-index: 100;
 }
 </style>

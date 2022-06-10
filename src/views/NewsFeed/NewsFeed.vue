@@ -22,10 +22,12 @@
                 </div>
             </div>
         </div>
-        <div class="wrap-posts" v-for="(item,index) in listDataPost" :key="index">
+        <div class="wrap-posts" v-for="(skeleton, index) in 4" :key="`skeleton-${index}`" v-show="showSkeleton">
+            <Skeleton></Skeleton>
+        </div>
+        <div class="wrap-posts" v-for="(item,index) in listDataPost" :key="index" v-show="!showSkeleton">
             <PostsBox :userID="userID" :avatar="avatar" :dataPost="item" @deletePost="deletePost" @forwardData="forwardData"/>
         </div>
-        <!-- TODO: Check lại Observer bị ảnh hưởng đến gọi phân trang bài viết -->
         <Observer @getPaging="getPagingData"/>
         <PopupCreateStatus v-if="isShowStatus" 
         v-model="contentStatus" 
@@ -39,16 +41,21 @@
 </template>
 <script>
 import PostsBox from "@/components/posts-box/PostsBox.vue"
-import PopupCreateStatus from "@/components/popup-create-status/PopupCreateStatus.vue"
+// import PopupCreateStatus from "@/components/popup-create-status/PopupCreateStatus.vue"
 import PostAPI from "@/api/PostAPI.js"
 import {State} from "@/models/enums/State.js"
 import Observer from "@/components/observer/Observer.vue"
+import Skeleton from "@/components/skeleton/Skeleton.vue"
+const PopupCreateStatus = () => import("@/components/popup-create-status/PopupCreateStatus.vue");
+// import {EventBus} from "../../main"
+
 export default {
     name: 'NewsFeed',
     components: {
         PostsBox,
         PopupCreateStatus,
-        Observer
+        Observer,
+        Skeleton
     },
     props:{
         avatar:{
@@ -69,6 +76,7 @@ export default {
             pageSize: 3,                //Số bản ghi query trong 1 lần paging
             totalPage: 0,               //Tổng số bản ghi
             userID: "",                 //ID của người dùng tài khoản
+            showSkeleton: true,
         }
     },
     created() {
@@ -110,6 +118,7 @@ export default {
                         this.listDataPost.push(item);
                     }
                 });
+                this.showSkeleton = false;
             })
         },
         /**
@@ -147,7 +156,6 @@ export default {
                 formData.append('image', file);
             }
 
-            // this.listDataPost = [];
             this.pageIndex = 0;
             this.totalPage = 0;
 
@@ -155,7 +163,9 @@ export default {
                 await PostAPI.save(formData).then((res)=>{
                     if(res.data.status === "Success"){
                         this.hideStatus();
-                        this.getTopData();
+                        // this.getTopData();
+                        this.listDataPost = [];
+                        this.getPagingData();
                     }else{
                         this.hideStatus();
                     }
@@ -163,6 +173,7 @@ export default {
             }else{
                 PostAPI.update(this.dataPost._id, formData).then(() => {
                     this.hideStatus();
+                    this.listDataPost = [];
                     this.getPagingData();
                 })
             }

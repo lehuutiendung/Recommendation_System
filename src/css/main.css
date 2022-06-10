@@ -1,6 +1,7 @@
 @import url(./margin-padding.css);
 @import url(./fb-icon.css);
 @import url(./svg-icon.css);
+@import url(./color.css);
 html, body{
     margin: 0;
     padding: 0;
@@ -157,6 +158,9 @@ html, body{
     background-color: #dddddd;
     cursor: pointer;
 }
+.space-between{
+    justify-content: space-between;
+}
 /* CSS font size */
 .text-size-24{
     font-size: 24px;
@@ -219,6 +223,9 @@ html, body{
     width: 100%;
 }
 
+.h-full{
+    height: 100% !important;
+}
 /* CSS cursor input */
 input[type=file], /* FF, IE7+, chrome (except button) */
 input[type=file]::-webkit-file-upload-button { /* chromes and blink button */

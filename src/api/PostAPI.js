@@ -30,5 +30,18 @@ class PostAPI extends BaseAPI {
      getTopInNewsfeed(data){
         return BaseAPIConfig.post(`${this.controller}/top-post`, data);
     }
+
+    /**
+     * Tương tác với bài viết (like, love, haha, wow, sad, angry)
+     * @param {*} data {
+                        "postID": "628862c2157d7d9be11cc5dd",
+                        "owner": "62886210157d7d9be11cc5c3",
+                        "reactType": 3, (1-LIKE, 2-LOVE, 3-HAHA, 4-WOW, 5-SAD, 6-ANGRY) 
+                        "state": 3 (1 - INSERT, 2 - UPDATE, 3- DELETE)
+                       }
+     */
+    interactivePost(data){
+        return BaseAPIConfig.post(`${this.controller}/post-react`, data)
+    }
 }
 export default new PostAPI();
