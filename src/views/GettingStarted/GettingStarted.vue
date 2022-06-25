@@ -24,45 +24,69 @@
                 <div class="box-login" v-if="isLogin">
                     <div class="success-register flex" v-if="doneRegister">
                         <div class="icon-48 icon-success"></div>
-                        <div class="content-noti">Đăng ký tài khoản thành công.</div>
-                    </div>    
+                        <div class="content-noti">Đăng ký tài khoản thành công</div>
+                    </div>  
+                      
                     <div class="title">VISONET</div>
                     <input class="input-login" v-model="email" type="text" placeholder="Email" v-on:keyup.enter="clickLogin">
-                    <input class="input-login" v-model="password" type="password" placeholder="Mật khẩu" v-on:keyup.enter="clickLogin">
+                    <div class="wrap-pass">
+                        <input 
+                        v-if="!isShowPass"
+                        class="input-login" 
+                        v-model="password" 
+                        type="password" 
+                        placeholder="Mật khẩu" 
+                        v-on:keyup.enter="clickLogin">
+                        <input 
+                        v-if="isShowPass"
+                        class="input-login" 
+                        v-model="password" 
+                        type="text" 
+                        placeholder="Mật khẩu" 
+                        v-on:keyup.enter="clickLogin">
+                        <div class="eye-pass" :class="{'icon-show-pass' : isShowPass, 'icon-hide-pass': !isShowPass}" @click="clickEyePass"></div>
+                    </div>
                     <div class="text-noti" v-if="accoutNotFound">Tài khoản này không tồn tại.</div>
                     <div class="text-noti" v-if="accoutWrong">Mật khẩu không đúng.</div>
                     <div class="button-login" @click="clickLogin">Đăng nhập</div>
-                    <div class="ask-forget-pass">Bạn quên mật khẩu?</div>
+                    <div class="ask-forget-pass" @click="isForgetPass = true">Bạn quên mật khẩu?</div>
                 </div>
             </div>
             <div class="right"></div> 
         </div>
         <PopupRegister v-if="isRegister" @closeBoxRegister="closeBoxRegister" @successRegister="successRegister"/>
+        <PopupForgetPassword v-if="isForgetPass" @closeForgetPass="closeForgetPass"></PopupForgetPassword>
     </div>
 </template>
 <script>
 import axios from "axios";
 import PopupRegister from "@/views/GettingStarted/PopupRegister.vue"
 import {EventBus} from "../../main"
-
+import PopupForgetPassword from "@/views/GettingStarted/PopupForgetPassword.vue"
 export default {
     name: 'GettingStarted',
     components:{
         PopupRegister,
+        PopupForgetPassword
     },
     data() {
         return {
             isLogin: false,         //Trạng thái popup đăng nhập
             isRegister: false,      //Trạng thái popup đăng ký
+            isForgetPass: false,    //Trạng thái popup quên mật khẩu
             doneRegister: false,    //Đăng ký tài khoản thành công
             email: "",
             password: "",
             accoutNotFound: false,  //Không tìm thấy tài khoản
             accoutWrong: false,     //Sai tài khoản,
             userID: "",
+            isShowPass: false,
         }
     },
     methods: {
+        clickEyePass(){
+            this.isShowPass = !this.isShowPass;
+        },
         backGettingStarted(){
             this.isLogin = false;
         },
@@ -83,6 +107,9 @@ export default {
          */
         closeBoxRegister(){
             this.isRegister = false;
+        },
+        closeForgetPass(){
+            this.isForgetPass = false;
         },
         /**
          * Đăng nhập
@@ -129,6 +156,15 @@ export default {
     },
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
     @import "../../css/views/GettingStartedCSS/getting-started.css";
+.wrap-pass{
+    position: relative;
+    .eye-pass{
+        position: absolute;
+        top: 10px;
+        right: 14px;
+        cursor: pointer;
+    }
+}
 </style>

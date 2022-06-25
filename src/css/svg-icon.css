@@ -25,3 +25,47 @@
     width: 20px;
 	height: 20px;
 }
+.icon-message-noti{
+    background: url("../assets/svg/feedback-svgrepo-com.svg");
+    background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
+}
+.icon-notify{
+    background-image: url("../assets/svg/bell-alert-svgrepo-com.svg");
+    background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
+}
+.icon-log-out{
+    background-image: url("../assets/svg/log-out.svg");
+    background-size: contain;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(40%) contrast(94%);
+}
+.button-icon{
+    margin-left: 10px;
+}
+.icon-video-call{
+    background-image: url(../assets/svg/video-call.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+}
+.icon-hide-pass{
+    background-image: url(../assets/svg/hide-password.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(90%) contrast(94%);
+}
+.icon-show-pass{
+    background-image: url(../assets/svg/show-password.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+    -webkit-filter: invert(59%) sepia(11%) saturate(200%) saturate(135%) hue-rotate(176deg) brightness(90%) contrast(94%);
+}
+.icon-scroll-top{
+    background-image: url(../assets/svg/scroll-top.svg);
+    background-size: contain;
+    width: 20px;
+	height: 20px;
+}

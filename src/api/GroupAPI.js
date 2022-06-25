@@ -22,5 +22,22 @@ class GroupAPI extends BaseAPI {
      outGroup(data){
         return BaseAPIConfig.post(`${this.controller}/out-group`, data);
     }
+
+    /**
+     * Lấy dữ liệu tất cả thành viên của nhóm
+     * @param {*} data 
+     */
+    filterMember(data){
+        return BaseAPIConfig.post(`${this.controller}/filter-member`, data);
+    }
+    
+    /**
+     * Tìm kiếm group (không paging)
+     * @param {*} data 
+     * @returns 
+     */
+    filterAllGroup(data){
+        return BaseAPIConfig.post(`${this.controller}/filter-group`, data);
+    }
 }
 export default new GroupAPI();

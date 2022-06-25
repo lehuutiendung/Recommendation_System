@@ -22,8 +22,12 @@
                             </div>
                             <div class="m-l-10 username">{{ item.userName }}</div>
                         </div>
+                        <div class="no-match m-t-20 p-l-10" v-if="listResultSearch.length == 0">
+                            <span>{{ $t('i18nCommon.NoMatch') }}</span> 
+                            <span>"{{inputSearch}}"</span> 
+                        </div>
                     </div>
-                    <div class="more-see">{{$t('i18nCommon.MoreSee')}}</div>
+                    <!-- <div class="more-see">{{$t('i18nCommon.MoreSee')}}</div> -->
                 </div>
             </div>
         </div>
@@ -40,7 +44,7 @@
                 </div>
             </div>
             <!-- Tin nhắn -->
-            <div class="icon-40 button-icon">
+            <div class="icon-40 button-icon" @click="redirectToChat">
                 <div class="icon-20 icon-message-noti"></div>
             </div>
             <!-- Thông báo ứng dụng -->
@@ -131,9 +135,7 @@ export default {
         })
 
         EventBus.$on('updateInfor', () => {
-            console.log("update name");
             this.userName = this.$store.getters.userInfor.userName;
-
         })
     },
     methods: {
@@ -155,6 +157,12 @@ export default {
             } catch (error) {
                 console.log(error);
             }
+        },
+        // Chuyển hướng đến trang tin nhắn
+        redirectToChat(){
+            this.$router.push({
+                name: 'ChatMonitor',
+            }).catch(()=>{});
         },
         /**
          * Chuyển hướng đến trang cá nhân
@@ -345,6 +353,7 @@ export default {
         width: inherit;
         height: inherit;
         border-radius: 50%;
+        object-fit: cover;
     }
 } 
 .header .number-noti{
@@ -388,6 +397,7 @@ export default {
                 width: inherit;
                 height: inherit;
                 border-radius: 50%;
+                object-fit: cover;
             }
             .content-request{
                 padding: 0 10px;

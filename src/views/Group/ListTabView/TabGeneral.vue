@@ -2,11 +2,13 @@
     <div class="tab-general">
         <div class="about-group">
             <div class="title">{{ $t('i18nGroup.TabGeneral.IntroduceGroup') }}</div>
-            <div class="general">{{ dataGroup.general }}</div>
+            <div class="general">
+                <div v-if="dataGroup.general != ''">{{ dataGroup.general }}</div>
+                <div v-else>Hãy tham gia nhóm {{ dataGroup.name }} để cập nhật những thông tin hữu ích.</div>
+            </div>
         </div>
         <div class="about-group">
-            <div class="title">{{ $t('i18nGroup.TabGeneral.MemberGroup') }}</div>
-            <div class="general">{{ totalMember }} thành viên</div>
+            <div class="title">{{ $t('i18nGroup.TabGeneral.AdminGroup') }}</div>
             <div class="admin-overview m-t-10">
                 <div class="icon-32 icon-avatar">
                     <cld-image
@@ -18,7 +20,6 @@
                     <div class="username">{{ adminGroup.userName }} {{ $t('i18nGroup.TabGeneral.Admin') }}</div>
                 </div>
             </div>
-            <div class="view-more-member">{{ $t('i18nGroup.TabGeneral.ViewMoreMember') }}</div>
         </div>
         <div class="about-group out-group" v-if="userJoined" @click="handleOutGroup">
             <div v-if="isOwner">Xóa nhóm</div>
@@ -77,8 +78,8 @@ export default {
             this.$router.push({
                 name: 'OverviewGroup'
             }).catch(()=>{});
-        }
-    },
+        },
+    }
 }
 </script>
 <style lang="scss" scoped>

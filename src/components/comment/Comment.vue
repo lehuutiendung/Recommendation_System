@@ -16,7 +16,7 @@
             v-if="isEdit"
             v-on="listeners" 
             ref="editcomment" 
-            v-on:keyup.enter.exact.prevent="submitComment"
+            @keydown.enter.prevent="submitComment"
             ></div>
             <div class="comment" v-if="!isEdit">{{ dataComment.content }}</div>
             <div class="item-comment" v-if="isEdit">
@@ -145,6 +145,10 @@ export default {
          * Tạo bình luận
          */
         submitComment(){
+            this.$eventBus.$emit('loading', true);
+            if(this.value == '' && this.previewImages.length == 0){
+                return;
+            }
             let formData = new FormData();
             formData.append('post', this.dataPost._id);
             formData.append('owner', this.$cookie.get('u_id'));
@@ -164,6 +168,7 @@ export default {
                 CommentAPI.save(formData).then(() => {
                     this.commentImages = [];
                     this.previewImages = [];
+                    this.$eventBus.$emit('loading', false);
                 }).then(()=>{
                     this.$emit('updatePagingComment');
                 }); 
@@ -172,6 +177,7 @@ export default {
                     this.commentImages = [];
                     this.previewImages = [];
                     this.listOldImage = [];
+                    this.$eventBus.$emit('loading', false);
                 }).then(()=>{
                     this.$emit('updatePagingComment');
                 }); 
@@ -190,8 +196,10 @@ export default {
          * Xóa bình luận
          */
         deleteComment(){
+            this.$eventBus.$emit('loading', true);
             CommentAPI.deleteByID(this.dataComment._id).then(() => {
                 this.$emit('updatePagingComment');
+                this.$eventBus.$emit('loading', false);
             })
         },
         async updateComment(){
@@ -346,9 +354,9 @@ export default {
 }
 .write-comment .popup-option{
     position: absolute;
-    top: 27px;
-    right: -62px;
-    z-index: 100;
+    top: 0px;
+    left: 30px;
+    z-index: 9999;
     padding: 4px;
     background-color: #ffffff;
     box-shadow: 0 0 2px 0 rgb(0 0 0 / 50%);

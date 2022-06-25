@@ -22,7 +22,10 @@
                 </div>
             </div>
         </div>
-        <div class="wrap-posts" v-for="item in listDataPost" :key="item._id">
+        <div class="wrap-posts" v-for="(skeleton, index) in 4" :key="`skeleton-${index}`" v-show="showSkeleton">
+            <Skeleton></Skeleton>
+        </div>
+        <div class="wrap-posts" v-for="item in listDataPost" :key="item._id" v-show="!showSkeleton">
             <PostsBox :userID="userID" :avatar="avatar" :dataPost="item" :showInfoGroup="false" @deletePost="deletePost" @forwardData="forwardData"/>
         </div>
         <Observer @getPaging="getPagingData"/>
@@ -36,17 +39,19 @@
     </div>
 </template>
 <script>
+import Skeleton from "@/components/skeleton/Skeleton.vue"
 import PostsBox from "@/components/posts-box/PostsBox.vue"
-import PopupCreateStatus from "@/components/popup-create-status/PopupCreateStatus.vue"
 import PostAPI from "@/api/PostAPI.js"
 import {State} from "@/models/enums/State.js"
 import Observer from "@/components/observer/Observer.vue"
+const PopupCreateStatus = () => import("@/components/popup-create-status/PopupCreateStatus.vue");
 export default {
     name: 'TabDiscussionGroup',
     components: {
         PostsBox,
         PopupCreateStatus,
-        Observer
+        Observer,
+        Skeleton
     },
     data() {
         return {
@@ -61,12 +66,22 @@ export default {
             userID: "",
             groupID: "",
             avatar: "",
+            showSkeleton: true,
         }
     },
     created() {
         this.groupID = this.$route.params.id;
         let userInfor = this.$store.getters.userInfor;
         this.avatar = userInfor.avatar;
+        this.getPagingData();
+
+        //Lắng nghe sự kiện refresh trang
+        this.$eventBus.$on('refresh', ()=>{
+            this.listDataPost = [];
+            this.pageIndex = 0;
+            this.totalPage = 0;
+            this.getPagingData();
+        })
     },
     mounted() {
         this.userID = this.$cookie.get('u_id');
@@ -95,7 +110,13 @@ export default {
             PostAPI.getPagingInGroup(dataReq).then( res => {
                 this.totalPage = res.data.data.totalPage;
                 //Push thêm data vào listDataPost
-                this.listDataPost = [...this.listDataPost, ...res.data.data.doc];
+                let lstResData = res.data.data.doc;
+                lstResData.forEach(item => {
+                    if(!this.listDataPost.find(x => x._id === item._id)){
+                        this.listDataPost.push(item);
+                    }
+                });
+                this.showSkeleton = false;
             })
         },
         /**
@@ -111,7 +132,7 @@ export default {
          * Gọi API lưu bài viết
          * @created 25/11/2021
          */
-        createPost(files, oldImage){
+        async createPost(files, oldImage){
             let formData = new FormData();
             formData.append('owner', this.$cookie.get('u_id'));
             formData.append('content', this.contentStatus);
@@ -121,15 +142,20 @@ export default {
                 let file = files[i];
                 formData.append('image', file);
             }
+
+            this.pageIndex = 0;
+            this.totalPage = 0;
+
             if(this.statePopup == State.Insert){
-                PostAPI.save(formData).then(() => {
+                await PostAPI.save(formData).then(() => {
                     this.hideStatus();
-                    this.pageIndex = 0;
+                    this.listDataPost = [];
                     this.getPagingData();
                 }); 
             }else{
-                PostAPI.update(this.dataPost._id, formData).then(() => {
+                await PostAPI.update(this.dataPost._id, formData).then(() => {
                     this.hideStatus();
+                    this.listDataPost = [];
                     this.getPagingData();
                 })
             }
@@ -139,7 +165,9 @@ export default {
          */
         deletePost(id){
             PostAPI.deleteByID(id).then(() => {
+                this.listDataPost = [];
                 this.pageIndex = 0;
+                this.totalPage = 0;
                 this.getPagingData();
             })
         },
@@ -151,6 +179,9 @@ export default {
             this.dataPost = data;
             this.statePopup = State.Update;
         }
+    },
+    beforeDestroy() {
+        this.$eventBus.$off('refresh');
     },
 }
 </script>

@@ -17,6 +17,7 @@ export default{
         PrivateRule: "Chỉ thành viên mới nhìn thấy mọi người trong nhóm và những gì họ đăng.",
         PublicRule: "Bất kỳ ai cũng có thể nhìn thấy mọi người trong nhóm và những gì họ đăng.",
         MemberGroup: "Thành viên",
+        AdminGroup: "Quản trị viên",
         Admin: "quản trị viên",
         ViewMoreMember: "Xem thêm các thành viên"
     },

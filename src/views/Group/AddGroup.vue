@@ -5,7 +5,12 @@
                 <div class="left-bar bar-create-group">
                     <div class="title-bar">{{ $t('i18nGroup.AddGroup.CreateGroup') }}</div>
                     <div class="wrap-item mg-b-10">
-                        <div class="icon-40 icon-avatar"></div>
+                        <div class="icon-40 icon-avatar">
+                            <cld-image 
+                                :publicId="cloudinaryID">
+                                <cld-transformation gravity="south" crop="fill"/>
+                            </cld-image>
+                        </div>
                         <div class="name-item">
                             <div class="username">{{ userNameAccount }}</div>
                             <div class="admin">{{ $t('i18nGroup.AddGroup.Admin' )}}</div>
@@ -58,11 +63,13 @@ export default {
             },
             generalGroup: "",           //Thông tin chung group
             userNameAccount: "",
+            cloudinaryID: ""
         }
     },
     created() {
-        this.userNameAccount = this.$cookie.get('u_name');
-        console.log(this.userNameAccount);
+        let userInfor = this.$store.getters.userInfor;
+        this.userNameAccount = userInfor.userName;
+        this.cloudinaryID = userInfor.avatar.cloudinaryID;
     },
     methods: {
         /**

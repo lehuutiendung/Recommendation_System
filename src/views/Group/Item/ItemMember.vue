@@ -1,11 +1,17 @@
 <template>
     <div class="item-member">
-        <div class="icon-40 icon-avatar"></div>
-        <div class="name-item p-l-10">
-            <div class="username">Đỗ Văn Anh</div>
-            <div class="tag">{{ $t('i18nGroup.TabMember.Member') }} </div>
+        <div class="icon-40 icon-avatar">
+            <cld-image 
+                :publicId="member.avatar.cloudinaryID">
+                <cld-transformation gravity="south" crop="fill"/>
+            </cld-image>
         </div>
-        <div class="icon-32 option-post" @click="showOption" v-click-outside="hidePopupOption">
+        <div class="name-item p-l-10">
+            <div class="username">{{ member.userName }}</div>
+            <div class="tag" v-if="member._id == admin._id">{{ $t('i18nGroup.TabMember.Admin') }} </div>
+            <div class="tag" v-else>{{ $t('i18nGroup.TabMember.Member') }} </div>
+        </div>
+        <div class="icon-32 option-post" v-if="member._id != admin._id && admin._id == userID" @click="showOption" v-click-outside="hidePopupOption">
             <div class="icon-16 icon-three-dots"></div>
         </div>
         <div class="popup-option" v-if="isShowOption">
@@ -20,10 +26,33 @@ export default {
     directives: {
         ClickOutSide
     },
+    props:{
+        member:{
+            type: Object,
+            default(){
+                return {
+                    avatar: {
+                        cloudinaryID: ""
+                    }
+                }
+            }
+        },
+        admin:{
+            type: Object,
+            default(){
+                return {}
+            }
+        }
+    },
     data() {
         return {
+            userID: "",
             isShowOption: false,    // Ẩn/hiện popup option trên các thành viên
         }
+    },
+    created() {
+        let userInfor = this.$store.getters.userInfor;
+        this.userID = userInfor._id;
     },
     methods: {
         // Hiện option (3 dots)

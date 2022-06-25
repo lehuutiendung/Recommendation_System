@@ -15,7 +15,15 @@
                         <div class="preview-image">
                             <div class="image" v-for="(image, key) in previewImages" :key="key">
                                 <img ref="image" :src="image">
-                                <div class="icon-24 clear-img" @click="clearImage(key)">
+                                <div class="icon-24 clear-img" @click="clearImage(key, 1)">
+                                    <div class="icon-16 icon-exit"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="preview-video">
+                            <div class="video" v-for="(video, key) in previewVideos" :key="key">
+                                <video ref="prevideo" :src="video" controls></video>
+                                <div class="icon-24 clear-img" @click="clearImage(key, 2)">
                                     <div class="icon-16 icon-exit"></div>
                                 </div>
                             </div>
@@ -30,7 +38,7 @@
                     <div class="item flex">
                         <div class="icon-32 icon-picture"></div>
                         <div class="name-item">{{ $t('i18nNewsFeed.BoxCreatePost.PictureAndVideo') }}</div>
-                        <input class="input-file" type="file" accept=".jpg, .jpeg, .png, .gif" multiple @change="onFileChange">
+                        <input class="input-file" type="file" accept=".jpg, .jpeg, .png, .gif, .mp4, .mov, .fla" multiple @change="onFileChange">
                     </div>
                     <div class="item flex">
                         <div class="icon-32 icon-emotion"></div>
@@ -82,7 +90,8 @@ export default {
             images: [],                 //Danh sách các file được chọn (ListFile) (Data call api)
             imgSrc : null,              //Source base 64 của hình ảnh
             isShowLoader: false,
-            avatar: {}
+            avatar: {},
+            previewVideos: [],
         }
     },
     created() {
@@ -101,8 +110,10 @@ export default {
             this.disableButton = false;
             this.$refs.editable.innerText = this.dataPost.content;
             this.$emit('input', this.$refs.editable.innerText);
-            let arraySrc = this.dataPost.image.map(x => x.imageURL);
-            this.previewImages = arraySrc;
+            let lstSrcImg = this.dataPost.image.filter(x => x.resourceType.includes('image'));
+            let lstSrcVideo = this.dataPost.image.filter(x => x.resourceType.includes('video'));
+            this.previewImages = lstSrcImg.map(x => x.imageURL);
+            this.previewVideos = lstSrcVideo.map(x => x.imageURL);
         }  
     },
     methods: {
@@ -139,6 +150,11 @@ export default {
                         listOldImage.push(element);
                     }
                 });
+                this.previewVideos.forEach(element => {
+                    if(!this.isBase64(element)){
+                        listOldImage.push(element);
+                    }
+                });
                 this.$emit('createPost', this.images, listOldImage);
             }else{
                 // Emit khi trạng thái: tạo bài viết mới
@@ -159,12 +175,31 @@ export default {
          * Render preview image
          */
         onFileChange(e) {
-            let arrayImages = e.target.files;
+            let lstFiles = e.target.files;
+            console.log(e.target.files);
+            let arrayImages = [...lstFiles].filter(x => x.type.includes('image'));
+            let arrayVideos = [...lstFiles].filter(x => x.type.includes('video'));
             // Lưu vào mảng images dùng làm data call api
             this.images = e.target.files;
-            for (let i = 0; i < arrayImages.length; i++) {
+            if(arrayImages.length > 0){
+                this.handlePreviewImage(arrayImages);
+            }
+            if(arrayVideos.length > 0){
+                this.handlePreviewVideo(arrayVideos);
+            }
+            // for (let i = 0; i < arrayImages.length; i++) {
+            //     let reader = new FileReader();
+            //     reader.readAsDataURL(arrayImages[i]);
+            //     reader.onload = () => {
+            //         this.imgSrc = reader.result;
+            //         this.previewImages.push(this.imgSrc);
+            //     };
+            // }
+        },
+        handlePreviewImage(imageFiles){
+            for (let i = 0; i < imageFiles.length; i++) {
                 let reader = new FileReader();
-                reader.readAsDataURL(arrayImages[i]);
+                reader.readAsDataURL(imageFiles[i]);
                 reader.onload = () => {
                     this.imgSrc = reader.result;
                     this.previewImages.push(this.imgSrc);
@@ -172,14 +207,31 @@ export default {
             }
         },
         /**
+         * Preview video
+         */
+        handlePreviewVideo(videoFiles){
+            for (let i = 0; i < videoFiles.length; i++) {
+                let reader = new FileReader();
+                reader.readAsDataURL(videoFiles[i]);
+                reader.onload = () => {
+                    let videoSrc = reader.result;
+                    this.previewVideos.push(videoSrc);
+                };
+            }
+        },
+        /**
          * Xóa image preview
          */
-        clearImage(key){
+        clearImage(key, type){
             //Không thể splice với array File, cần convert sang Array.
             let tempArr = Array.from(this.images);
             tempArr.splice(key, 1);
             this.images = tempArr;
-            this.previewImages.splice(key, 1);
+            if(type == 1){
+                this.previewImages.splice(key, 1);
+            }else{
+                this.previewVideos.splice(key, 1);
+            }
         }
     },
     watch:{
@@ -258,7 +310,7 @@ export default {
     margin-right: 10px;
     
 }
-.preview-image .image .clear-img{
+.clear-img{
     position: absolute;
     top: 0;
     right: 0;
@@ -270,11 +322,25 @@ export default {
     margin: 5px;
     cursor: pointer;
 }
-.preview-image .image .clear-img:hover{
+.clear-img:hover{
     background-color: #dfdfdf;
 }
 .wrap-text-image .preview-image img{
     max-width: 200px;
+}
+.wrap-content .wrap-text-image .preview-video{
+    width: 100%;
+    display: flex;
+    margin-top: 10px;
+    overflow-y: scroll;
+}
+.wrap-content .wrap-text-image .preview-video .video{
+    position: relative;
+    margin-right: 10px;
+    
+}
+.preview-video video{
+    max-width: 300px;
 }
 .create-posts .wrap-button{
     display: flex;

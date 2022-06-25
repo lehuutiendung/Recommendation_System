@@ -6,8 +6,8 @@
                 <!-- Thông tin chung -->
                 <div class="wrap-flex">
                     <div class="title">{{ $t('i18nPersonal.TabAbout.GeneralInformation' )}}</div>
-                    <ButtonIcon :text="$t('i18nPersonal.TabAbout.UpdateInformation')" width="auto" color="white" icon="fb-icon-pencil" @click.native="clickUpdate" v-if="stateView"/>
-                    <div class="flex" v-else>
+                    <ButtonIcon :text="$t('i18nPersonal.TabAbout.UpdateInformation')" width="auto" color="white" icon="fb-icon-pencil" @click.native="clickUpdate" v-if="stateView && isOwnerAcc"/>
+                    <div class="flex" v-if="!stateView">
                         <ButtonIcon :text="$t('i18nCommon.Cancel')" width="auto" color="white" @click.native="clickCancel"/>
                         <ButtonIcon :text="$t('i18nCommon.Save')" width="auto" color="blue" @click.native="clickSave"/>
                     </div>
@@ -47,7 +47,7 @@
                 <div class="w-50-per">
                     <div class="item">  
                         <div class="label-item">Email</div>
-                        <Input :stateView="stateView" v-model="userData.email"/>
+                        <Input :stateView="true" v-model="userData.email"/>
                     </div>
                     <div class="item">  
                         <div class="label-item">Di động</div>
@@ -93,11 +93,17 @@ export default {
         return {
             stateView: true,
             userData: {},
+            isOwnerAcc: false,
         }
     },
     created() {
         let userInfor = this.$store.getters.userInfor;
-        if(userInfor){
+        if(userInfor._id == this.$route.params.id){
+            this.isOwnerAcc = true;
+        }else{
+            this.isOwnerAcc = false;
+        }
+        if(this.isOwnerAcc){
             this.userData = userInfor;
             // Chuyển đổi enum => loại giới tính
             if(this.userData.gender == 0){
