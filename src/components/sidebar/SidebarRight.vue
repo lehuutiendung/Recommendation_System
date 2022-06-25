@@ -29,11 +29,8 @@ export default {
             showSkeleton: true,
         }
     },
-    created() {
-        this.recommendPost();
-    },
     methods: {
-        recommendPost(){
+        async recommendPost(){
             let userInfo = this.$store.getters.userInfor
             let userID = userInfo.userID;
             let userIDMongo = userInfo._id;
@@ -41,12 +38,23 @@ export default {
                 userID: userID,
                 userIDMongo: userIDMongo
             }
-            RecommendAPI.getRecommendPost(param).then(res => {
+            await RecommendAPI.getRecommendPost(param).then(res => {
                 this.dataSource = res.data;
                 this.showSkeleton = false;
             })
         }
     },
+    watch:{
+        "$store.getters.userInfor":{
+            handler(val){
+                if(val && val._id){
+                    this.recommendPost();
+                }
+            },
+            deep: true,
+            immediate: true
+        }
+    }
 }
 </script>
 <style lang="scss" scoped>

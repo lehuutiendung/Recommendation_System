@@ -19,7 +19,7 @@
                             <!-- TODO: Xu ly su kien click da tham gia  -> Roi nhom -->
                             <ButtonText text="Đã tham gia" v-if="userJoined"/>
                             <!-- TODO: Xu ly su kien click tham gia -> Tham gia nhom -->
-                            <ButtonText text="Tham gia" v-if="!userJoined"/>
+                            <ButtonText text="Tham gia" v-if="!userJoined" @click.native="requestJoinGroup"/>
                             <ButtonIcon text="Mời" icon="fb-icon-add" v-if="userJoined"/>
                         </div>
                         <div class="wrap-header-item">
@@ -36,7 +36,7 @@
             </template>
             <template v-slot:center>
                 <div class="center">
-                    <router-view :userJoined="userJoined"></router-view>
+                    <router-view :key="$route.path" :userJoined="userJoined"></router-view>
                 </div>
             </template>
             <template v-slot:right-bar>
@@ -79,9 +79,9 @@ export default {
             userJoined: false,
         }
     },
-    created() {
+    async created() {
         this.detectActiveTab();
-        GroupAPI.getByID(this.$route.params.id).then((res) => {
+        await GroupAPI.getByID(this.$route.params.id).then((res) => {
             if(res.data && res.data.success){
                 this.dataGroup = res.data.doc;
                 this.totalMember = this.dataGroup.members.length;
@@ -91,7 +91,9 @@ export default {
                 this.userJoined = this.listMember.includes(this.$cookie.get("u_id"));
             }
         })
-        
+        if(!this.userJoined){
+            this.listTab = [{ titleTab: 'Giới thiệu' }]
+        }
     },
     methods: {
         /**
@@ -134,8 +136,34 @@ export default {
                 default:
                     break;
             }
+        },
+        /**
+         * Click button yêu cầu tham gia nhóm
+         */
+        requestJoinGroup(){
+            this.userJoined = true;
+            let dataRequest = {
+                groupID: this.dataGroup._id,
+                userID: this.$cookie.get("u_id")
+            }
+            GroupAPI.joinGroup(dataRequest);
         }
     },
+    watch:{
+        userJoined:{
+            handler(val){
+                if(val){
+                    this.listTab =[
+                        { titleTab: 'Giới thiệu' },
+                        { titleTab: 'Thảo luận' },
+                        { titleTab: 'Thành viên' }
+                    ];
+                }else{
+                    this.listTab = [{ titleTab: 'Giới thiệu' }]
+                }
+            }
+        }
+    }
 }
 </script>
 <style lang="scss" scoped>
@@ -188,6 +216,7 @@ export default {
     margin-top: 20px;
     border-top: 1px solid #cccccc;
     display: flex;
+    justify-content: center;
     .tab-item{
         position: relative;
         display: flex;

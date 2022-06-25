@@ -72,5 +72,21 @@ class UserAPI extends BaseAPI{
      changeBackground(id,data){
         return BaseAPIConfig.put(`${this.controller}/background/${id}`, data); 
     }
+    /**
+     * Lấy trạng thái online/offline tất cả bạn bè của người dùng
+     * @param {*} data 
+     * @returns 
+     */
+    getStatusOfFriends(data){
+        return BaseAPIConfig.post(`${this.controller}/get-status-friends`, data);
+    }
+    /**
+     * Hủy kết bạn
+     */
+    deleteFriend(data){
+        return BaseAPIConfig.post(`${this.controller}/delete-friend`, data);
+    }
+
+    
 }
 export default new UserAPI();

@@ -12,7 +12,7 @@
                             <cld-transformation gravity="south" crop="fill"/>
                         </cld-image>
                         <ButtonIcon 
-                        v-if="isMyPage && previewAvatar == '' && previewBackground == ''"
+                        v-if="isMyPage && !file"
                         class="btn-update-image" 
                         text="Cập nhật ảnh" 
                         width="auto" 
@@ -69,7 +69,7 @@
             </template>
             <template v-slot:center>
                 <div class="w-full">
-                    <router-view></router-view>
+                    <router-view :key="$route.path"></router-view>
                 </div>
             </template>
         </Overview>
@@ -82,11 +82,7 @@ import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import {Notification} from "@/models/enums/Notification.js"
 import ClickOutSide from "@/mixins/detectoutside.js"
 const InputFile = () => import("@/components/input-file/InputFile.vue")
-const TabAbout = () => import("@/views/Personal/ListTabView/TabAbout.vue")
-const TabFriend = () => import("@/views/Personal/ListTabView/TabAbout.vue")
-const TabLibrary = () => import("@/views/Personal/ListTabView/TabAbout.vue")
-import TabTimeline from "@/views/Personal/ListTabView/TabAbout.vue"
-
+import {EventBus} from "../../main";
 export default {
     name: 'PersonalPage',
     directives: {
@@ -109,26 +105,19 @@ export default {
             },
             userID: "",
             ownerID: "",
+            ownerInfor: {},
             listTab:[
                 {
                     titleTab: 'Dòng thời gian',
-                    tabKey: 1,
-                    component: TabTimeline
                 },
                 {
                     titleTab: 'Giới thiệu',
-                    tabKey: 2,
-                    component: TabAbout
                 },
                 {
                     titleTab: 'Hình ảnh',
-                    tabKey: 3,
-                    component: TabLibrary
                 },
                 {
                     titleTab: 'Bạn bè',
-                    tabKey: 4,
-                    component: TabFriend
                 }
             ],
             currentTab: 0,              //Tab dòng thời gian
@@ -140,32 +129,29 @@ export default {
             file: null,
             typeChangeImage: null,      // 0: Thay đổi ảnh đại diện - 1: thay đổi ảnh bìa
             isMyPage: false,
+            isProcessChooseImg: false,  // Đang trong quá trình chọn ảnh đại diện hoặc ảnh bìa
         }
     },   
     created() {
-        this.getInfoUser();
-        this.getInfoOwner();
         this.detectActiveTab();
         this.userID = this.$route.params.id;
+        this.ownerInfor = this.$store.getters.userInfor;
+        this.ownerID = this.ownerInfor._id;
+        this.listFriendOwner = this.ownerInfor.friends;
+        this.isFriend = this.checkIsFriend(this.userID);
     }, 
     methods: {
-        /**
-         * Call API thông tin của owner tài khoản 
-         */
-        getInfoOwner(){
-            this.ownerID = this.$cookie.get('u_id');
-            UserAPI.getByID(this.ownerID).then((res)=>{
-                this.listFriendOwner = res.data.doc.friends;
-                this.isFriend = this.checkIsFriend(this.userID);
-            })
-        },
         /**
          * Call API thông tin của người dùng trong trang cá nhân hiện tại
          */
         getInfoUser(){
-            UserAPI.getByID(this.$route.params.id).then((res)=>{
-                this.dataUser = res.data.doc;
-            })
+            if(this.ownerInfor._id != this.$route.params.id){
+                UserAPI.getByID(this.$route.params.id).then((res)=>{
+                    this.dataUser = res.data.doc;
+                })
+            }else{
+                this.dataUser = this.ownerInfor;
+            }
         },
         /**
          * Phát hiện tab hiện tại và bật active tab tương ứng
@@ -290,11 +276,15 @@ export default {
          */
         clickSave(){
             let formData = new FormData();
+            this.$eventBus.$emit('loading', true);
             if(this.previewAvatar != ""){
                 formData.append("avatar", this.file);
                 UserAPI.changeAvatar(this.ownerID, formData).then( res => {
                     if(res.data && res.data.success){
                         this.file = null;
+                        this.$eventBus.$emit('loading', false);
+                    }else{
+                        this.$eventBus.$emit('loading', false);
                     }
                 });
             }else{
@@ -302,9 +292,13 @@ export default {
                 UserAPI.changeBackground(this.ownerID, formData).then( res => {
                     if(res.data && res.data.success){
                         this.file = null;
+                        this.$eventBus.$emit('loading', false);
+                    }else{
+                        this.$eventBus.$emit('loading', false);
                     }
                 });
             }
+            EventBus.$emit('updateInfor');
         }
 
     },
@@ -312,7 +306,7 @@ export default {
         // Cập nhật thông tin khi thay đổi trang cá nhân 
         '$route.params.id': {
             handler: function(userIDCurrent) {
-                if(this.userID != userIDCurrent){
+                if(userIDCurrent){
                     this.getInfoUser();
                 }
                 let myID = this.$store.getters.userInfor._id;
@@ -375,6 +369,7 @@ export default {
                     width: 96%;
                     height: 96%;
                     border-radius: 50%;
+                    object-fit: cover;
                 }
             }
             .info-name{

@@ -81,6 +81,14 @@ export default {
     },
     created() {
         this.getPagingData();
+
+        //Lắng nghe sự kiện refresh trang
+        this.$eventBus.$on('refresh', ()=>{
+            this.pageIndex = 0;
+            this.totalPage = 0;
+            this.listDataPost = [];
+            this.getPagingData();
+        })
     },
     mounted() {
         this.userID = this.$cookie.get('u_id');
@@ -200,7 +208,7 @@ export default {
         }
     },
     destroyed () {
-
+        this.$eventBus.$off('refresh');
     },
 }
 </script>

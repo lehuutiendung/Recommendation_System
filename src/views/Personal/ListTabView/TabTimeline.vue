@@ -22,12 +22,11 @@
                 </div>
             </div>
             <!-- Bạn bè -->
-            <div class="box box-friend">
+            <div class="box box-friend" v-if="topFriend.length > 0">
                 <div class="flex-spacebetween">
                     <div class="title">{{ $t('i18nPersonal.TabTimeline.Friend') }}</div>
                     <div class="button-more" @click="redirectToTabAllFriend(dataUser._id)">{{ $t('i18nPersonal.TabTimeline.ViewAllFriend' )}}</div>
                 </div>
-                <div class="m-t-10">100 {{ $t('i18nPersonal.TabTimeline.FriendText' )}}</div>
                 <div class="grid-friend">
                     <div class="grid-item" v-for="(friend, index) in topFriend" :key="index">
                         <div class="picture" @click="redirectToPageFriend(friend._id)">
@@ -42,7 +41,7 @@
                 </div>
             </div>
             <!-- Gợi ý trang -->
-            <div class="box box-suggest-page m-b-10">
+            <!-- <div class="box box-suggest-page m-b-10">
                 <div class="title">{{ $t('i18nPersonal.TabTimeline.SuggestPage' )}}</div>
                 <div class="item-group">
                     <div class="avatar-gr">
@@ -84,7 +83,7 @@
                     </div>
                     <div class="name-gr">Nhóm sinh viên đại học Bách Khoa Hà Nội</div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <!-- Center -->
         <div class="center">
@@ -110,8 +109,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="wrap-posts" v-for="item in listDataPost" :key="item._id">
-                    <PostsBox :userID="userID" :avatar="avatar" :dataPost="item" @deletePost="deletePost" @forwardData="forwardData"/>
+                <div class="wrap-posts" v-for="(skeleton, index) in 4" :key="`skeleton-${index}`" v-show="showSkeleton">
+                    <Skeleton></Skeleton>
+                </div>
+                <div class="wrap-posts" v-for="item in listDataPost" :key="item._id" v-show="!showSkeleton">
+                    <PostsBox :userID="ownerID" :avatar="avatar" :dataPost="item" @deletePost="deletePost" @forwardData="forwardData"/>
                 </div>
                 <Observer @getPaging="getPagingData"/>
                 <PopupCreateStatus v-if="isShowStatus" 
@@ -129,11 +131,10 @@
             <div class="box box-picture">
                 <div class="title">{{ $t('i18nPersonal.TabTimeline.LatestPhotos' )}}</div>
                 <div class="grid-picture">
-                    <div class="grid-item" v-for="(picture, index) in 9" :key="index">
+                    <div class="grid-item" v-for="(picture, index) in historyImage" :key="index">
                         <div class="picture">
                             <cld-image 
-                                :publicId="imageDefault" 
-                                loading="lazy">
+                                :publicId="picture.cloudinaryID" loading="lazy" @click.native="viewFullImage(picture.cloudinaryID)">
                                 <cld-transformation gravity="south" crop="fill"/>
                             </cld-image>
                         </div>
@@ -141,7 +142,7 @@
                 </div>
             </div>
             <!-- Gợi ý bạn bè -->
-            <div class="box box-suggest-friend m-b-10">
+            <!-- <div class="box box-suggest-friend m-b-10">
                 <div class="title">{{ $t('i18nPersonal.TabTimeline.SuggestFriend' )}}</div>
                 <div class="item-friend" v-for="(friend, index) in 8" :key="index">
                     <div class="flex">
@@ -158,25 +159,30 @@
                         <div class="icon-16 icon-add-friend"></div>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
+        <ZoomImage v-if="showZoomImage" :dataZoomImage="dataZoomImage" @exitDimmed="exitDimmed"></ZoomImage>
     </div>
 </template>
 <script>
+import Skeleton from "@/components/skeleton/Skeleton.vue"
 import PostsBox from "@/components/posts-box/PostsBox.vue"
-import PopupCreateStatus from "@/components/popup-create-status/PopupCreateStatus.vue"
+const PopupCreateStatus = () => import("@/components/popup-create-status/PopupCreateStatus.vue");
 import PostAPI from "@/api/PostAPI.js"
 import UserAPI from "@/api/UserAPI.js"
 import {State} from "@/models/enums/State.js"
 import Observer from "@/components/observer/Observer.vue"
 import moment from "moment"
+const ZoomImage = () => import("@/components/zoom-image/ZoomImage.vue");
 
 export default {
     name: 'TabTimelinePersonal',
     components:{
         PostsBox,
         PopupCreateStatus,
-        Observer
+        Observer,
+        Skeleton,
+        ZoomImage
     },
     data() {
         return {
@@ -190,23 +196,74 @@ export default {
             pageSize: 3,                //Số bản ghi query trong 1 lần paging
             totalPage: 0,               //Tổng số bản ghi
             userID: "",                 //ID của người dùng tại trang cá nhân
+            ownerID: "",                //ID của account đang đăng nhập
             topFriend: [],              //Danh sách top 4 bạn bè
             dataUser:{},                 //Object user
-            joinDate: "",
+            joinDate: "",               //Ngày tham gia
             avatar: {},                 //Avatar account
+            showSkeleton: true,         //Skeleton bài viết
+            historyImage: [],           //hình ảnh gần đây
+            showZoomImage: false,
+            dataZoomImage: ""
         }
     },
     created() {
         let userInfor = this.$store.getters.userInfor;
         this.avatar= userInfor.avatar;
         this.groupID = this.$route.params.id;
-        this.getTopFriend();
-        this.getInfoUser();
+        this.ownerID = userInfor._id;
+        this.getPagingImage();
+
+        //Lắng nghe sự kiện refresh trang
+        this.$eventBus.$on('refresh', ()=>{
+            this.listDataPost = [];
+            this.pageIndex = 0;
+            this.totalPage = 0;
+            this.getPagingData();
+        })
     },
     mounted() {
         this.userID = this.$route.params.id;
     },
     methods: {
+        /**
+         * Click ảnh để xem chế độ toàn ảnh
+         */
+        viewFullImage(cloudinaryID){
+            this.showZoomImage = true;
+            this.dataZoomImage = cloudinaryID;
+        },
+        /**
+         * Tắt xem phóng to ảnh
+         */
+        exitDimmed(){
+            this.showZoomImage = false;
+        },
+        /**
+         * Gọi API phân trang lấy hình ảnh library
+         */
+        getPagingImage(){
+            let dataFilter = {
+                userID: this.$route.params.id,
+                pageSize: 9,
+                pageIndex: 1
+            }
+
+            UserAPI.getImageLibrary(dataFilter).then((res) => {
+                //Tạo 1 mảng chứa các object image { postID, cloudinaryID }
+                let resDoc = res.data.doc;
+                resDoc.forEach(element => {
+                   let imageIDs = element.image.map(x => x.cloudinaryID);
+                   imageIDs.forEach(imageID => {
+                        let dataImage = {
+                            postID: element._id,
+                            cloudinaryID: imageID
+                        }
+                        this.historyImage.push(dataImage);
+                   });
+                });
+            })
+        },
         //Hiển thị popup tạo bài viết
         showPopupPost(){
             this.isShowStatus = true;
@@ -217,21 +274,6 @@ export default {
             this.contentStatus = "";
             this.isShowStatus = false;
         },
-        // getPagingData(){
-        //     if(this.pageIndex > this.totalPage){
-        //         return;
-        //     }
-        //     this.pageIndex++;
-        //     let dataReq = {
-        //         pageIndex: this.pageIndex,
-        //         pageSize: this.pageSize,
-        //     }
-        //     PostAPI.getPaging(dataReq).then( res => {
-        //         this.totalPage = res.data.data.totalPage;
-        //         //Push thêm data vào listDataPost
-        //         this.listDataPost = [...this.listDataPost, ...res.data.data.doc];
-        //     })
-        // },
         getPagingData(){
             if(this.pageIndex > this.totalPage){
                 return;
@@ -245,7 +287,13 @@ export default {
             PostAPI.getPagingInWall(dataReq).then( res => {
                 this.totalPage = res.data.data.totalPage;
                 //Push thêm data vào listDataPost
-                this.listDataPost = [...this.listDataPost, ...res.data.data.doc];
+                let lstResData = res.data.data.doc;
+                lstResData.forEach(item => {
+                    if(!this.listDataPost.find(x => x._id === item._id)){
+                        this.listDataPost.push(item);
+                    }
+                });
+                this.showSkeleton = false;
             })
         },
         /**
@@ -272,19 +320,19 @@ export default {
                 formData.append('image', file);
             }
             
-            this.listDataPost = [];
             this.pageIndex = 0;
             this.totalPage = 0;
             
             if(this.statePopup == State.Insert){
                 PostAPI.save(formData).then(() => {
                     this.hideStatus();
-                    console.log('tab timeline');
+                    this.listDataPost = [];
                     this.getPagingData();
                 }); 
             }else{
                 PostAPI.update(this.dataPost._id, formData).then(() => {
                     this.hideStatus();
+                    this.listDataPost = [];
                     this.getPagingData();
                 })
             }
@@ -294,8 +342,10 @@ export default {
          */
         deletePost(id){
             PostAPI.deleteByID(id).then(() => {
-                // this.getPagingData();
                 this.listDataPost = [];
+                this.pageIndex = 0;
+                this.totalPage = 0;
+                this.getPagingData();
             })
         },
         /**
@@ -314,6 +364,7 @@ export default {
                 userID: this.$route.params.id,
                 pageSize: 4,
                 pageIndex: 1,
+                userName: ""
             }
             UserAPI.filterTopFriend(filter).then((res)=>{
                 this.topFriend = res.data.doc.friends;
@@ -323,10 +374,15 @@ export default {
          * Call API thông tin của người dùng
          */
         getInfoUser(){
-            UserAPI.getByID(this.$route.params.id).then((res)=>{
-                this.dataUser = res.data.doc;
-                this.joinDate = moment(this.dataUser.createdAt).format('DD-MM-YYYY');
-            })
+            let ownerInfor = this.$store.getters.userInfor;
+            if(ownerInfor._id != this.$route.params.id){
+                UserAPI.getByID(this.$route.params.id).then((res)=>{
+                    this.dataUser = res.data.doc;
+                })
+            }else{
+                this.dataUser = ownerInfor;
+            }
+            this.joinDate = moment(this.dataUser.createdAt).format('DD-MM-YYYY');
         },
         /**
          * Chuyển hướng đến trang cá nhân bạn bè
@@ -350,17 +406,21 @@ export default {
     watch:{
         // Cập nhật thông tin khi thay đổi trang cá nhân 
         '$route.params.id': {
-            handler: function(userIDCurrent) {
+            handler(userIDCurrent) {
                 if(this.userID != userIDCurrent){
                     this.getTopFriend();
                     this.getInfoUser();
+                    this.getPagingData();
                     this.userID = userIDCurrent;
                 }
             },
             deep: true,
             immediate: true
         }
-    }
+    },
+    beforeDestroy() {
+        this.$eventBus.$off('refresh');
+    },
 }
 </script>
 <style lang="scss" scoped>
@@ -406,10 +466,9 @@ export default {
             }
             .grid-friend{
                 display: grid;
-                margin-top: 10px;
-                grid-column-gap: 10px;
-                grid-row-gap: 10px;
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+                grid-gap: 20px;
+                align-items: start;
                 .grid-item{
                     aspect-ratio: 1;
                     -webkit-transition: all .2s ease-in-out;

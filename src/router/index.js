@@ -14,8 +14,12 @@ let router = new VueRouter({
             }
         },
         {
+            path: '/change-password/:id', 
+            name: 'ChangePassword', 
+            component: () => import('@/views/GettingStarted/ChangePassword.vue'),
+        },
+        {
             path: '/', 
-            name: 'Overview', 
             component: () => import('@/views/Overview/Overview.vue'),
             meta: {
                 requiresAuth: true
@@ -108,6 +112,22 @@ let router = new VueRouter({
                     component: () => import('@/views/Group/ListTabView/TabMember.vue'),
                 },
             ]
+        },
+        {
+            path: '/chat',
+            name: 'ChatMonitor',
+            component: () => import('@/views/Chat/ChatMonitor.vue'),
+            meta: {
+                requiresAuth: true
+            },
+        },
+        {
+            path: '/video-call',
+            name: 'VideoCall',
+            component: () => import('@/views/VideoCall/VideoCall.vue'),
+            meta: {
+                requiresAuth: true
+            },
         },
     ]
 })

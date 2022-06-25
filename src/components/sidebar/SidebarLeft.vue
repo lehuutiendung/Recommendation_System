@@ -22,22 +22,23 @@
                     <div class="icon-32 icon-group"></div>
                     <div class="name-item">Nhóm</div>
                 </router-link>
-                <div class="wrap-item">
+                <router-link to="/chat" class="wrap-item">
                     <div class="icon-32 icon-message"></div>
                     <div class="name-item">Tin nhắn</div>
-                </div>
+                </router-link>
                 <div class="wrap-online">
                     <div class="title-online m-l-20">{{$t('i18nCommon.Online')}}</div>
-                    <div class="wrap-item flex m-b-4" v-for="i in 10" :key="i">
-                        <div class="icon-online m-r-4"></div>
+                    <div class="wrap-item flex m-b-4" v-for="friend in lstFriends" :key="friend.userID" @click="chatWithFriend(friend)">
+                        <div class="icon-online m-r-4" v-if="friend.isOnline"></div>
+                        <div class="icon-offline m-r-4" v-else></div>
                         <div class="flex">
                             <div class="icon-32 icon-avatar">
                                 <cld-image 
-                                    :publicId="avatar.cloudinaryID">
+                                    :publicId="friend.avatar.cloudinaryID">
                                     <cld-transformation gravity="south" crop="fill"/>
                                 </cld-image>
                             </div>
-                            <div class="name-item">Họ và Tên</div>
+                            <div class="name-item">{{friend.userName}}</div>
                         </div>
                     </div>
                 </div>
@@ -46,6 +47,9 @@
     </div>
 </template>
 <script>
+import UserAPI from "@/api/UserAPI.js"
+import {EventBus} from "../../main";
+
 export default {
     name: 'SidebarLeft',
     props:{
@@ -60,6 +64,14 @@ export default {
             }
         }
     },
+    data() {
+        return {
+            lstFriends: [],             //Danh sách bạn bè của người dùng
+        }
+    },
+    created() {
+        this.statusFriends();
+    },
     methods: {
         /**
          * Chuyển hướng đến trang cá nhân
@@ -69,6 +81,20 @@ export default {
                 name: 'Personal',
                 params: { id: this.$cookie.get('u_id')}
             }).catch(()=>{});
+        },
+        statusFriends(){
+            let param = {
+                userID: this.$cookie.get('u_id')
+            }
+            UserAPI.getStatusOfFriends(param).then(res => {
+                if(res.data && res.data.success){
+                    this.lstFriends = res.data.lstFriends;
+                }
+            })
+        },
+        //Click chọn chat với bạn bè
+        chatWithFriend(friend){
+            EventBus.$emit('chat-with-friend', friend);
         }
     },
 }
@@ -139,14 +165,14 @@ export default {
     background-image: url(../../assets/png/bubbles-alt-svgrepo-com.png);
 }
 .icon-online{
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background-size: contain;
     background-image: url(../../assets/png/online.png);
 }
 .icon-offline{
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background-size: contain;
     background-image: url(../../assets/png/offline.png);
 }

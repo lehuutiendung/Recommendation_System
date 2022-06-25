@@ -122,6 +122,7 @@ html, body{
     width: inherit;
     height: inherit;
     border-radius: 50%;
+    object-fit: cover;
 }
 
 /* Start: Button icon */
@@ -230,4 +231,18 @@ html, body{
 input[type=file], /* FF, IE7+, chrome (except button) */
 input[type=file]::-webkit-file-upload-button { /* chromes and blink button */
     cursor: pointer; 
+}
+
+.no-match{
+    font-weight: 450;
+    color: #4f4f4f;
+    white-space: pre;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.spinner{
+    position: absolute !important;
+    right: 20px;
+    top: 62px;
 }

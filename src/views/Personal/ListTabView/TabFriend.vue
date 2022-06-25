@@ -5,7 +5,12 @@
             <div class="visonet center-friend">
                 <div class="wrap-box">
                     <div class="title">{{ $t('i18nPersonal.TabFriend.Friend') }}</div>
-                    <InputIcon class="mg-r-10" icon="icon-search" placeholder="Tìm kiếm bạn bè" :autoFocus="true"/>
+                    <InputIcon 
+                    v-model="searchValue"
+                    class="mg-r-10" 
+                    icon="icon-search" 
+                    placeholder="Tìm kiếm bạn bè" 
+                    :autoFocus="true"/>
                 </div>
                 <div class="group-tab">
                     <div class="tab-item" v-for="(tab, index) in listTab" :key="index" @click="changeTab(index)">
@@ -14,7 +19,7 @@
                     </div>
                 </div>
                 <div class="body-sub-tab">
-                    <router-view></router-view>
+                    <router-view :key="$route.path" :searchValue="searchValue"></router-view>
                 </div>
             </div>
         </div>
@@ -34,13 +39,11 @@ export default {
                     titleTab: 'Tất cả bạn bè'
                 },
                 {
-                    titleTab: 'Kết bạn gần đây'
-                },
-                {
                     titleTab: 'Quê quán'
                 },
             ],
             currentTab: 0,              //Tab dòng thời gian      
+            searchValue: "",           
         }
     },
     methods: {

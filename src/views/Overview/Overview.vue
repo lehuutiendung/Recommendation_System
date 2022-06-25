@@ -1,6 +1,6 @@
 <template>
     <div class="overview">
-        <div class="content" :style="{'padding-top' : paddingTopContent + 'px'}">
+        <div class="content" ref="contentScroll" :style="{'padding-top' : paddingTopContent + 'px'}">
             <div class="pre-content" v-if="showPreContent">
                 <slot name="pre-content"></slot>
             </div>
@@ -21,6 +21,9 @@
                     </div>
                 </slot>
             </div>
+        </div>
+        <div class="scroll-top" @click="refreshPage" v-show="visibleRefresh">
+            <div class="icon-scroll-top"></div>
         </div>
     </div>
 </template>
@@ -58,6 +61,7 @@ export default {
         return {
             userName: "",
             avatar: {},
+            visibleRefresh: false,          //Hiển thị button refresh trang
         }
     },
     created() {
@@ -65,7 +69,23 @@ export default {
         this.userName = userInfor.userName;
         this.avatar = userInfor.avatar;
     },
+    mounted() {
+        this.$refs.contentScroll.addEventListener("scroll", this.handleScroll);
+    },
     methods: {
+        /**
+         * Sự kiện scroll và ẩn hiện button refresh
+         */
+        handleScroll(e){
+            this.visibleRefresh = e.target.scrollTop > window.innerHeight ? true : false;
+        },
+        /**
+         * Scroll tới đầu trang
+         */
+        refreshPage(){
+            this.$refs.contentScroll.scrollTo(0,0);
+            this.$eventBus.$emit('refresh');
+        },
         /**
          * Chuyển hướng đến trang cá nhân
          */
@@ -76,11 +96,26 @@ export default {
             }).catch(()=>{});
         },
     },
+    beforeDestroyed() {
+        this.$refs.contentScroll.removeEventListener("scroll", this.handleScroll);
+    },
 }
 </script>
 <style lang="scss" scoped>
 @import "../../css/views/Overview/overview.css";
 .button-icon{
     position: relative;
+}
+.scroll-top{
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 15px;
+    right: 14px;
+    bottom: 24px;
+    cursor: pointer;
+    transform: scale(1.5);
 }
 </style>

@@ -33,20 +33,26 @@
                 <div class="content-img" v-for="(image, key) in dataPost.image" :key="key">
                     <!-- <img :src="image.imageURL" alt="" @click.native="viewFullImage(image.imageURL)"> -->
                     <cld-image 
+                        v-if="image.resourceType == 'image'"
                         :publicId="image.imageURL" 
                         loading="lazy" @click.native="viewFullImage(image.imageURL)">
                         <cld-transformation width="auto" gravity="south" crop="fill"/>
                     </cld-image>
+                    <!-- TODO: preview image  -->
+                    <cld-video 
+                        v-if="image.resourceType == 'video'"
+                        :publicId="image.imageURL" controls="true">
+                    </cld-video>
                 </div>
             </div>
             <div class="view-number">
                 <div class="view-react"></div>
                 <div class="group-comment-share flex">
                     <div class="view-comment" v-if="totalRecord > 0">{{ totalRecord }} bình luận</div>
-                    <div class="view-share">2 lượt chia sẻ</div>
                 </div>
             </div>
             <div class="view-button">
+                <!-- Thích -->
                 <div class="group-btn" @mouseleave="hideEmoticon" @click.exact="clickReactDefault">
                     <div class="flex reaction-hover" @mouseover="showEmoticon">
                         <div class="icon-18 icon-like" 
@@ -73,14 +79,16 @@
                         <div class="icon-36 mg-r-10 icon-emoticon angry-emoticon" @click="clickEmoticon($event,1)"></div>
                     </div>
                 </div>
+                <!-- Bình luận -->
                 <div class="group-btn">
                     <div class="icon-18 icon-comment"></div>
                     <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Comment') }}</div>
                 </div>
-                <div class="group-btn">
+                <!-- Chia sẻ -->
+                <!-- <div class="group-btn">
                     <div class="icon-18 icon-share"></div>
                     <div class="btn-name">{{ $t('i18nNewsFeed.PostsCard.Share') }}</div>
-                </div>
+                </div> -->
             </div>
             <div class="border-box-comment">
                 <Comment v-model="commentText" 
@@ -176,9 +184,6 @@ export default {
             isAngry: false,         //Reaction angry
             isNoReaction: true,     //Bài viết không có reaction
             commentText: "",        //Nội dung viết comment (text)
-            commentImages: [],      //Ảnh trong comment
-            imgSrc: null,           //Source base 64 của hình ảnh
-            previewImages: [],      //Danh sách các src ảnh base 64 -> Preview Image
             pageIndex: 1,               //Phân trang dữ liệu
             pageSize: 3,                //Số bản ghi query trong 1 lần paging
             totalPage: 1,               //Tổng số bản ghi
@@ -413,32 +418,6 @@ export default {
             })
         },
         /**
-         * Render preview image
-         */
-        onFileChange(e) {
-            let arrayImages = e.target.files;
-            // Lưu vào mảng images dùng làm data call api
-            this.commentImages = e.target.files;
-            for (let i = 0; i < arrayImages.length; i++) {
-                let reader = new FileReader();
-                reader.readAsDataURL(arrayImages[i]);
-                reader.onload = () => {
-                    this.imgSrc = reader.result;
-                    this.previewImages.push(this.imgSrc);
-                };
-            }
-        },
-        /**
-         * Xóa image preview
-         */
-        clearImage(key){
-            //Không thể splice với array File, cần convert sang Array.
-            let tempArr = Array.from(this.commentImages);
-            tempArr.splice(key, 1);
-            this.commentImages = tempArr;
-            this.previewImages.splice(key, 1);
-        },
-        /**
          * Paging sau khi cập nhật xong dữ liệu bình luận
          */
         updatePagingComment(){
@@ -539,6 +518,7 @@ export default {
     box-shadow: 0 0 2px 0 rgb(0 0 0 / 50%);
     border-radius: 4px;
     font-weight: 500;
+    z-index: 99999;
 }
 .posts-box .popup-option .item-option{
     padding: 10px;
@@ -592,6 +572,11 @@ export default {
     height: auto;
     width: 100%;
 }
+.posts-box .content-img video{
+    max-width: 100%;
+    height: auto;
+    width: 100%;
+}
 .posts-box .view-number{
     display: flex;
     justify-content: space-between;
@@ -611,7 +596,7 @@ export default {
     flex-wrap: wrap;
     align-items: center;
     height: 44px;
-    padding: 0 10px;
+    padding: 0 15%;
 }
 .posts-box .view-button .group-btn{
     position: relative;

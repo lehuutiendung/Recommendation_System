@@ -12,6 +12,8 @@
                   class="mg-r-10"
                   icon="icon-search"
                   placeholder="Tìm kiếm nhóm"
+                  v-model="searchValue"
+                  @input.native="handleSearch" 
                   :autoFocus="true"
                 />
                 <ButtonText
@@ -125,6 +127,22 @@ export default {
     this.getPagingData();
   },
   methods: {
+    // Tìm kiếm nhóm
+    handleSearch(){
+      if(this.inputSearch != ''){
+        let dataReq = {
+          name: this.searchValue,
+          pageIndex: this.pageIndex,
+          pageSize: this.pageSize,
+          userID: this.$cookie.get("u_id"),
+        };
+        GroupAPI.getPaging(dataReq).then((res) => {
+          this.totalPage = res.data.data.totalPage;
+          //Push thêm data vào listGroup
+          this.listGroup = res.data.data.doc;
+        });
+      }
+    },
     /**
      * Phân trang
      */
@@ -232,6 +250,7 @@ export default {
   flex-direction: column;
   padding-left: 10px;
   font-size: 15px;
+  width: 70%;
 }
 .tab-group-render .item-group .title-group .name-group {
   font-weight: 450;
@@ -264,7 +283,6 @@ export default {
   border-radius: 8px;
   height: 50vh;
   background-color: #ffffff;
-  position: fixed;
   right: 8px;
   .sidebar-right {
     height: 50vh;
@@ -285,4 +303,8 @@ export default {
   display: inline-block;
   -webkit-filter: var(--filter-accent);
 }
+</style>
+<style lang="scss">
+// Đè CSS
+
 </style>

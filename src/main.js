@@ -1,11 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import App from './App.vue'
+// import App from './App.vue'
+import Main from './Main.vue'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 import VueCookie from 'vue-cookie'
 import router from './router'
-import Cloudinary, { CldImage, CldTransformation } from "cloudinary-vue";
+import Cloudinary, { CldImage, CldVideo, CldTransformation } from "cloudinary-vue";
+import Spinner from 'vue-spinkit'
 // import VueSocketIO from 'vue-socket.io'
 import io from 'socket.io-client'
 
@@ -18,6 +20,8 @@ import { _getLocalStorage, _setLocalStorage, _removeLocalStorage , _getSessionSt
 
 export const EventBus = new Vue();
 
+Vue.component('Spinner', Spinner);
+
 Vue.use(Vuex);
 Vue.use(VueCookie);
 Vue.use(VueAxios, axios);
@@ -27,6 +31,7 @@ Vue.use(Cloudinary, {
   configuration: { cloudName: "visonetcloud" },
   components: {
     CldImage,
+    CldVideo,
     CldTransformation,
   }
 });
@@ -52,7 +57,7 @@ window.$function = Vue.prototype.$function = {
  * Khai báo toàn cục socket - sử dụng qua biến $socket
  */ 
 Vue.prototype.$socket = io('http://localhost:3000');
-
+Vue.prototype.$eventBus = EventBus;
 Vue.config.productionTip = false
 
 // new Vue({
@@ -69,5 +74,5 @@ new Vue({
   router,
   store,
   i18n,
-  render: h => h(App),
+  render: h => h(Main),
 }).$mount('#app')

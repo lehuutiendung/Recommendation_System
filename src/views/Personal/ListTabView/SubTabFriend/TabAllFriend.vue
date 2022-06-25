@@ -1,40 +1,73 @@
 <template>
     <div class="grid-card">
-        <div class="card" v-for="(friend, index) in listFriends" :key="index">
-            <div class="avatar" @click="redirectToPageFriend(friend._id)">
-                <cld-image 
-                    :publicId="friend.avatar.cloudinaryID" 
-                    loading="lazy">
-                    <cld-transformation gravity="south" crop="fill"/>
-                </cld-image>
-            </div>
-            <div class="wrap-info" @click="redirectToPageFriend(friend._id)">
-                <div class="name">{{ friend.userName }}</div>
-            </div>
-            <div class="icon-32 option">
-                <div class="icon-16 icon-three-dots"></div>
-            </div>
+        <div v-for="(friend) in listFriends" :key="friend._id">
+            <CardFriend :friend="friend" :userID="userID" @deleteFriend="deleteFriend"></CardFriend>
+        </div>
+        <div class="no-match m-t-20 p-l-10" v-if="listFriends.length == 0">
+            <span>{{ $t('i18nCommon.NoMatch') }}</span> 
+            <span>"{{searchValue}}"</span> 
         </div>
     </div>
 </template>
 <script>
 import UserAPI from "@/api/UserAPI.js"
+import ClickOutSide from "@/mixins/detectoutside.js"
+import CardFriend from "../CardFriend/CardFriend.vue"
 export default {
     name: 'TabAllFriend',
+    directives: {
+        ClickOutSide
+    },
+    components:{
+        CardFriend,
+    },
+    props:{
+        searchValue:{
+            type: String,
+            default: ""
+        }
+    },
     data() {
         return {
             pageIndex: 0,               //Phân trang dữ liệu
             listFriends: [],            //Danh sách bạn bè
             userID: "",                 //ID của người dùng trong trang cá nhân
+            ownerID: "",                //ID của người dùng account
+            isShowOption: false,
         }
     },
     created() {
         this.getPagingFriend();
+        let userInfor = this.$store.getters.userInfor;
+        this.ownerID = userInfor._id;
     },
     methods: {
+        //Hủy kết bạn
+        async deleteFriend(friendID){
+            let param = {
+                ownerID: this.ownerID,
+                friendID: friendID
+            }
+            await UserAPI.deleteFriend(param).then(res => {
+                if(res.data && res.data.success){
+                    console.log(res);
+                    this.getPagingFriend();
+                }
+            })
+        },
+        // Hiện option (3 dots)
+        showOption(e, friendID){
+            console.log(e, friendID);
+            this.isShowOption = !this.isShowOption;
+        },
+        // Ẩn option (3 dots)
+        hidePopupOption(){
+            this.isShowOption = false;
+        },
         getPagingFriend(){
             let filter = {
                 userID: this.$route.params.id,
+                userName: this.searchValue,             //Tìm bạn bè
                 pageSize: 20,
                 pageIndex: 1,
             }
@@ -63,6 +96,11 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        searchValue: {
+            handler(){
+                this.getPagingFriend();
+            }
         }
     }
 }
@@ -74,58 +112,32 @@ export default {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     grid-auto-rows: 100px;
     margin-top: 10px;
-    .card {
-        position: relative;
-        display: flex;
-        align-items: center;
-        font-size: 1.2rem;
-        box-shadow: rgba(3, 8, 20, 0.1) 0px 0.15rem 0.5rem, rgba(2, 8, 20, 0.1) 0px 0.075rem 0.175rem;
-        height: 100%;
-        width: 100%;
-        border-radius: 4px;
-        transition: all 500ms;
-        overflow: hidden;
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        padding: 0;
-        margin: 0;
-        .avatar {
-            margin-left: 10px;
-            width: 80px;
-            height: 80px;
-            cursor: pointer;
-            img{
-                width: 100%;
-                height: 100%;
-                border-radius: 6px;
-            }
-            
-        }
-        .wrap-info{
-            margin-left: 10px;
-            .name:hover{
-                text-decoration: underline;
-                cursor: pointer;
-            }
-        }
-        .option{
-            position: absolute;
-            right: 14px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .option:hover{
-            background-color: #dddddd;
-        }
-    }
 }    
 .icon-three-dots{
     background: url(../../../../assets/svg/three-dots-svgrepo-com.svg);
     background-size: contain; 
     -webkit-filter: var(--filter-secondary-icon);
+}
+.popup-option{
+    position: absolute;
+    top: 40px;
+    right: 14px;
+    padding: 4px;
+    background-color: #ffffff;
+    box-shadow: 0 0 2px 0 rgb(0 0 0 / 50%);
+    border-radius: 4px;
+    font-weight: 500;
+    z-index: 99999;
+    font-size: 15px;
+}
+.popup-option .item-option{
+    padding: 10px;
+    cursor: pointer;
+}
+.popup-option .item-delete{
+    color: #ff3217!important;
+}
+.popup-option .item-option:hover{
+    background-color: #F2F7FC;
 }
 </style>
