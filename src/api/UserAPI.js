@@ -27,17 +27,17 @@ class UserAPI extends BaseAPI{
      * @param {*} data: userID
      * @returns 
      */
-    getNotificationAddFriend(data){
-        return BaseAPIConfig.post(`${this.controller}/notification-add-friend`, data);
+    getNotificationNotSeen(data){
+        return BaseAPIConfig.post(`${this.controller}/notification-not-seen`, data);
     }
 
     /**
-     * Hàm lưu yêu cầu kết bạn
+     * Hàm lưu thông báo, yêu cầu
      * @param {*} data 
      * @returns 
      */
-    createdRequestAddFriend(data){
-        return BaseAPIConfig.post(`${this.controller}/request-addfriend`, data);
+    saveRequestNoti(data){
+        return BaseAPIConfig.post(`${this.controller}/save-request-noti`, data);
     }
 
     /**
@@ -86,7 +86,14 @@ class UserAPI extends BaseAPI{
     deleteFriend(data){
         return BaseAPIConfig.post(`${this.controller}/delete-friend`, data);
     }
-
+    /**
+     * Cập nhật trạng thái đã xem của thông báo
+     * @param {*} data 
+     * @returns 
+     */
+    updateStatusNoti(data){
+        return BaseAPIConfig.post(`${this.controller}/update-status-notification`, data);
+    }
     
 }
 export default new UserAPI();

@@ -26,6 +26,20 @@
                     <div class="icon-32 icon-message"></div>
                     <div class="name-item">Tin nhắn</div>
                 </router-link>
+                <div class="wrap-online" v-if="lstGroups.length > 0">
+                    <div class="title-online m-l-20">{{$t('i18nCommon.GroupJoined')}}</div>
+                    <div class="wrap-item flex m-b-4" v-for="group in lstGroups" :key="group._id" @click="redirectToGroup(group._id)">
+                        <div class="flex">
+                            <div class="icon-32 icon-avatar">
+                                <cld-image 
+                                    :publicId="group.background.cloudinaryID">
+                                    <cld-transformation gravity="south" crop="fill"/>
+                                </cld-image>
+                            </div>
+                            <div class="name-item">{{group.name}}</div>
+                        </div>
+                    </div>
+                </div>
                 <div class="wrap-online">
                     <div class="title-online m-l-20">{{$t('i18nCommon.Online')}}</div>
                     <div class="wrap-item flex m-b-4" v-for="friend in lstFriends" :key="friend.userID" @click="chatWithFriend(friend)">
@@ -67,12 +81,22 @@ export default {
     data() {
         return {
             lstFriends: [],             //Danh sách bạn bè của người dùng
+            lstGroups: [],              //Danh sách nhóm đã tham gia của người dùng tài khoản
         }
     },
     created() {
         this.statusFriends();
     },
     methods: {
+        /**
+         * Chuyển hướng đến nhóm được chọn
+         */
+        redirectToGroup(groupID){
+            this.$router.push({
+                name: "GroupDetail",
+                params: { id: groupID },
+            });
+        },
         /**
          * Chuyển hướng đến trang cá nhân
          */
@@ -89,6 +113,7 @@ export default {
             UserAPI.getStatusOfFriends(param).then(res => {
                 if(res.data && res.data.success){
                     this.lstFriends = res.data.lstFriends;
+                    this.lstGroups = res.data.lstGroups;
                 }
             })
         },

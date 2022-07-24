@@ -14,7 +14,8 @@ export default  {
         GeneralInformation: "Thông tin chung",
         ContactInformation: "Thông tin liên hệ",
         UpdateInformation: "Cập nhật thông tin",
-        WorkInformation: "Công việc và học vấn"
+        WorkInformation: "Công việc và học vấn",
+        Others: "Khác"
     },
     TabLibrary: {
         Picture: "Hình ảnh"

@@ -114,6 +114,14 @@ let router = new VueRouter({
             ]
         },
         {
+            path: '/post/:id',
+            name: 'DetailPost',
+            component: () => import('@/views/DetailPost/DetailPost.vue'),
+            meta: {
+                requiresAuth: true
+            }
+        },
+        {
             path: '/chat',
             name: 'ChatMonitor',
             component: () => import('@/views/Chat/ChatMonitor.vue'),

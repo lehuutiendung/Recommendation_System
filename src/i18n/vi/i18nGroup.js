@@ -4,7 +4,8 @@ export default{
         TitleSuggest: "Gợi ý nhóm cho bạn",
         ContentSuggest: "Nhóm mà bạn có thể quan tâm",
         RequestJoinGroup: "Tham gia nhóm",
-        JoinGroup: "Truy cập"
+        JoinGroup: "Truy cập",
+        NotFound: "Nhóm này hiện không khả dụng."
     },
     AddGroup:{
         CreateGroup: "Tạo nhóm",

@@ -38,7 +38,6 @@
                         loading="lazy" @click.native="viewFullImage(image.imageURL)">
                         <cld-transformation width="auto" gravity="south" crop="fill"/>
                     </cld-image>
-                    <!-- TODO: preview image  -->
                     <cld-video 
                         v-if="image.resourceType == 'video'"
                         :publicId="image.imageURL" controls="true">

@@ -2,14 +2,18 @@
   <div>
     <header-app v-if="showHeader" @logout="hideHeader"></header-app>
     <router-view></router-view>
-    <ChatBox 
-    v-if="isOpenChat"
-    v-model="message"
-    :dataFriend="dataFriend"
-    :isOpenChat="isOpenChat"
-    @clearMessage="message=''" 
-    @exitChat="exitChat"
-    ></ChatBox>
+    <div class="wrap-box-chat">
+      <div class="m-l-10" v-for="(dataFriend, index) in lstDataFriend" :key="index">
+        <ChatBox 
+        v-if="isOpenChat"
+        v-model="message"
+        :dataFriend="dataFriend"
+        :isOpenChat="isOpenChat"
+        @clearMessage="message=''" 
+        @exitChat="exitChat"
+        ></ChatBox>
+      </div>
+    </div>
     <Spinner className="spinner" name="fading-circle" color="#7442BD" width="46" height="46" v-if="isSpinner"/>
   </div>
 </template>
@@ -31,7 +35,8 @@ export default {
       message: "",
       isOpenChat: false,
       dataFriend: null,
-      isSpinner: false
+      isSpinner: false,
+      lstDataFriend: []
     }
   },
   created() {
@@ -47,6 +52,10 @@ export default {
 
     //Nhận userID khi click chọn người nhắn tin
     EventBus.$on('chat-with-friend', (data) => {
+        //TODO: Mở tắt độc lập các box chat
+        if(!this.lstDataFriend.includes(data)){
+          this.lstDataFriend.push(data);
+        }
         this.dataFriend = data;
         this.isOpenChat = true;
     })
@@ -59,11 +68,6 @@ export default {
     //Eventbus ẩn/hiện loading
     EventBus.$on('loading', (data) => {
         this.isSpinner = data;
-    })
-  },
-  mounted() {
-    this.$socket.on("get_notification", (data) => {
-        EventBus.$emit('notification_addfriend', data);
     })
   },
   methods:{
@@ -97,4 +101,10 @@ export default {
 
 <style lang="scss" scoped>
   @import "../src/css/main.css";
+.wrap-box-chat{
+    position: absolute;
+    bottom: 0;
+    right: 38px;
+    display: flex;
+}
 </style>

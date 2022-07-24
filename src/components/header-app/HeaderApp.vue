@@ -50,24 +50,28 @@
             <!-- Thông báo ứng dụng -->
             <div class="icon-40 button-icon" @click="showPopupNotify" v-click-outside="hidePopupNotify">
                 <div class="icon-20 icon-notify"></div>
-                <div class="number-noti" v-if="listNotification.length > 0">{{ listNotification.length }}</div>
+                <div class="number-noti" v-if="numberNotiUnSeen > 0">{{ numberNotiUnSeen }}</div>
                 <div class="box-noti" v-if="isShowNotify">
                     <div class="title-box">{{ $t('i18nCommon.Notification') }}</div>
                     <div class="group-request-fr">
                         <div class="noti-request-fr" v-for="(item,index) in listNotification" :key="index">
-                            <div class="avatar icon-56">
+                            <div class="avatar icon-40">
                                 <cld-image 
                                     :publicId="item.avatar">
                                     <cld-transformation width="100" gravity="south" crop="fill"/>
                                 </cld-image>
                             </div>
-                            <div class="content-request">
+                            <div class="content-request" v-if="item.typeNoti == 0">
                                 <div><span class="username">{{ item.userName }}</span> đã gửi cho bạn lời mời kết bạn.</div>
                                 <div class="group-btn">
                                     <ButtonIcon text="Xác nhận" width="100" @click.native="handleAcceptFriend(item)"/>
                                     <ButtonIcon text="Xóa" width="100" color="white" @click.native="handleRejectFriend(item.id)"/>
                                 </div>
                             </div>
+                            <div class="content-request" v-if="item.typeNoti == 1" @click="directDetailPost(item)">
+                                <div><span class="username">{{ item.userName }}</span> đã bình luận về bài viết của bạn.</div>
+                            </div>
+                            <div class="not-seen" v-if="!item.seen"></div>
                         </div>
                     </div>
                 </div>
@@ -111,6 +115,7 @@ export default {
             inputSearch: "",                //Giá trị tìm kiếm
             listResultSearch: [],
             avatar: "",                     //Avatar user
+            numberNotiUnSeen: 0             //Số thông báo chưa xem
         }
     },
     async created() {
@@ -121,7 +126,7 @@ export default {
             let query = {
                 userID: this.$cookie.get('u_id')
             }
-            axios.post(ConfigApiEnum.URL_API + `users/notification-add-friend`, query,
+            axios.post(ConfigApiEnum.URL_API + `users/notification-not-seen`, query,
             {
                 headers: this.headers, 
             }).then((res) => {
@@ -130,15 +135,45 @@ export default {
         }
     },
     mounted() {
-        EventBus.$on('notification_addfriend', (data) =>  {
-            this.listNotification.push(data);
+        this.$socket.on('get_notification', (data) =>  {
+            this.listNotification.unshift(data);
         })
 
         EventBus.$on('updateInfor', () => {
             this.userName = this.$store.getters.userInfor.userName;
         })
+
+        this.$socket.on('notification', (data) => {
+            this.listNotification.unshift(data);
+        })
     },
     methods: {
+        /**
+         * Điều hướng đến chi tiết bài viết và cập nhật trạng thái đã xem cho thông báo
+         */
+        directDetailPost(item){
+            this.$router.push({
+                name: 'DetailPost',
+                params: { id: item.postID}
+            }).catch(()=>{});
+            if(!item.seen){
+                this.updateStatusNoti(item.id);
+                this.numberNotiUnSeen = this.numberNotiUnSeen - 1;
+                item.seen = true;
+            }
+        },
+        /**
+         * Cập nhật trạng thái đã xem cho thông báo
+         */
+        updateStatusNoti(notiID){
+            let param = {
+                notiID: notiID
+            }
+            axios.post(ConfigApiEnum.URL_API + `users/update-status-notification`, param,
+            {
+                headers: this.headers, 
+            })
+        },
         /**
          * Lấy thông tin user hiện tại
          */
@@ -243,6 +278,21 @@ export default {
          */
         handleLogOut(){
             this.$emit("logout", true);
+        }
+    },
+    watch:{
+        listNotification:{
+            handler(val){
+                let me = this;
+                if(val.length > 0){
+                    let lstUnSeen = me.listNotification.filter(x => x.seen == false);
+                    me.numberNotiUnSeen = lstUnSeen.length;
+                }else{
+                    me.numberNotiUnSeen = 0;
+                }
+            },
+            deep: true,
+            immediate: true
         }
     },
     beforeDestroy() {
@@ -390,6 +440,7 @@ export default {
     }
     .group-request-fr{
         .noti-request-fr{
+            position: relative;
             display: flex;
             padding: 8px;
             border-radius: 5px;
@@ -410,6 +461,15 @@ export default {
                     padding: 0 10px;
                     margin-top: 10px;
                 }
+            }
+            .not-seen{
+                width: 10px;
+                height: 10px;
+                background-color: #3C8BF3;
+                border-radius: 50%;
+                position: absolute;
+                right: 2px;
+                top: 12px;
             }
         }
         .noti-request-fr:hover{

@@ -9,9 +9,9 @@
                     </cld-image>
                 </div>
                 <div class="name">{{ dataFriend.userName }}</div>
-                <div class="m-l-14 video-call flex">
+                <!-- <div class="m-l-14 video-call flex">
                     <div class="icon-24 icon-video-call"></div>
-                </div>
+                </div> -->
             </div>
             <div class="icon-32 button-exit" @click="exitChat">
                 <div class="icon-16 icon-exit"></div>
@@ -48,6 +48,7 @@
                     </div>
                 </div>
             </div>
+            <div class="typing-chat" v-if="dataTyping.typing && (dataTyping.toUserID == fromUserID)">{{ dataTyping.fromUserName }} đang soạn tin nhắn</div>
         </div>
         <div class="footer-box">
             <div class="comment" 
@@ -91,9 +92,13 @@ export default {
             toUserID: "",           //ID nggười nhận tin nhắn    ,
             pageSize: 1,
             onTopPageSize: false,   //Đã scroll hết bản ghi
+            dataTyping: {},          //Đang gõ tin nhắn hay không,
+            ownerName: null,        //Tên người dùng tài khoản
         }
     },
     async created() {
+        let userInfo = this.$store.getters.userInfor;
+        this.ownerName = userInfo.userName;
         this.fromUserID = this.$cookie.get('u_id');
         this.toUserID = this.dataFriend._id;
         await this.getPagingMessage();
@@ -111,6 +116,11 @@ export default {
         setTimeout(() => {
             framechatBody.scrollTo(0, document.body.scrollHeight + 100)
         }, 100);
+
+        this.$socket.on("typing", (data) => {
+            this.dataTyping = data;
+        })
+        
         //Nhận message từ socket server
         this.$socket.on("receive-message", (message) => {
             //Bắn tin nhắn socket và cập nhật list message về đúng box chat có người gửi trùng khớp người nhận
@@ -246,6 +256,21 @@ export default {
         value: function(){
             if(this.value == ""){
                 this.$refs.messagechat.innerText = this.value;
+                let data = {
+                    fromUserID: this.fromUserID,
+                    fromUserName: this.ownerName,
+                    toUserID: this.toUserID,
+                    typing: false
+                }
+                this.$socket.emit("stopTyping", data)
+            }else{
+                let data = {
+                    fromUserID: this.fromUserID,
+                    fromUserName: this.ownerName,
+                    toUserID: this.toUserID,
+                    typing: true
+                }
+                this.$socket.emit("typing", data);
             }
         },
         dataFriend:{
@@ -264,12 +289,13 @@ export default {
 </script>
 <style lang="scss" scoped>
 .chat-box{
-    position: absolute;
+    position: relative;
+    // position: absolute;
     width: 325px;
     height: 420px;
     background-color: #ffffff;
     bottom: 0;
-    right: 38px;
+    // right: 38px;
     box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;;
     border-radius: 10px;
     overflow: hidden;
@@ -340,6 +366,16 @@ export default {
         opacity: 0;
         cursor: pointer;
     }
+}
+.typing-chat{
+    position: sticky;
+    width: 100%;
+    bottom: 0px;
+    display: flex;
+    padding-left: 10px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    background-color: #ffffff;
 }
 .preview-image{
     position: sticky;

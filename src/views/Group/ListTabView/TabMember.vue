@@ -52,7 +52,11 @@ export default {
         }
     },
     async created() {
-        await GroupAPI.getByID(this.$route.params.id).then((res) => {
+        let param = {
+            groupID: this.$route.params.id,
+            userID: this.$cookie.get("u_id")
+        }
+        await GroupAPI.getByID(param).then((res) => {
             this.dataGroup = res.data.doc;
             this.totalMember = this.dataGroup.members.length;
             this.admin._id = this.dataGroup.admin._id;

@@ -1,6 +1,6 @@
 <template>
     <div class="group-detail">
-        <Overview :showPreContent="true" :paddingTopContent="0">
+        <Overview :showPreContent="true" :paddingTopContent="0" v-if="!isNotFound">
             <template v-slot:pre-content>
                 <div class="header-group">
                     <div class="background">
@@ -43,6 +43,7 @@
                 <div class="right-bar"></div>
             </template>
         </Overview>
+        <NotFound :content="notFound" v-else></NotFound>
     </div>
 </template>
 <script>
@@ -50,12 +51,14 @@ import Overview from "@/views/Overview/Overview.vue"
 import GroupAPI from "@/api/GroupAPI.js"
 import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import ButtonText from "@/components/buttontext/ButtonText.vue"
+import NotFound from "@/components/not-found/NotFound.vue"
 export default {
     name: 'GroupDetail',
     components:{
         Overview,
         ButtonIcon,
-        ButtonText
+        ButtonText,
+        NotFound
     },
     data() {
         return {
@@ -77,11 +80,18 @@ export default {
             currentTab: 0,              //Tab giới thiệu
             listMember: [],
             userJoined: false,
+            notFound: this.$t('i18nGroup.OverviewGroup.NotFound'),
+            isNotFound: false,
+
         }
     },
     async created() {
         this.detectActiveTab();
-        await GroupAPI.getByID(this.$route.params.id).then((res) => {
+        let param = {
+            groupID: this.$route.params.id,
+            userID: this.$cookie.get("u_id")
+        }
+        await GroupAPI.getByID(param).then((res) => {
             if(res.data && res.data.success){
                 this.dataGroup = res.data.doc;
                 this.totalMember = this.dataGroup.members.length;
@@ -89,6 +99,8 @@ export default {
                 this.listMember = this.dataGroup.members;
                 // Check người dùng đã tham gia nhóm hay chưa
                 this.userJoined = this.listMember.includes(this.$cookie.get("u_id"));
+            }else{
+                this.isNotFound = true;
             }
         })
         if(!this.userJoined){
