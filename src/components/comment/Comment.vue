@@ -44,6 +44,10 @@
 </template>
 <script>
 import CommentAPI from "@/api/CommentAPI.js"
+import UserAPI from "@/api/UserAPI.js"
+import {Notification} from "@/models/enums/Notification.js"
+import {RequestEnum} from "@/models/enums/Request.js"
+
 export default {
     name: 'Comment',
     props:{
@@ -145,10 +149,28 @@ export default {
          * Tạo bình luận
          */
         submitComment(){
-            this.$eventBus.$emit('loading', true);
             if(this.value == '' && this.previewImages.length == 0){
                 return;
             }
+
+            // Gửi thông báo bình luận bài viết
+            let userInfor = this.$store.getters.userInfor;
+            if(userInfor._id != this.dataPost.owner._id){
+                let socketNoti = {
+                    avatar: userInfor.avatar.cloudinaryID,
+                    userName: userInfor.userName,
+                    userRequestID: userInfor._id,
+                    userRecipientID: this.dataPost.owner._id,
+                    typeNoti: Notification.POST,    //typeNoti: 1 (Post)
+                    status: RequestEnum.NONE,
+                    postID: this.dataPost._id,
+                    seen: false
+                }
+                this.$socket.emit('notification', socketNoti);
+                UserAPI.saveRequestNoti(socketNoti);
+            }
+
+            this.$eventBus.$emit('loading', true);
             let formData = new FormData();
             formData.append('post', this.dataPost._id);
             formData.append('owner', this.$cookie.get('u_id'));
@@ -165,6 +187,7 @@ export default {
                 formData.append('image', file);
             }
             if(!this.isUpdateState){
+                // Bình luận mới
                 CommentAPI.save(formData).then(() => {
                     this.commentImages = [];
                     this.previewImages = [];
@@ -173,6 +196,7 @@ export default {
                     this.$emit('updatePagingComment');
                 }); 
             }else{
+                //Cập nhật bình luận
                 CommentAPI.update(this.dataComment._id, formData).then(() => {
                     this.commentImages = [];
                     this.previewImages = [];

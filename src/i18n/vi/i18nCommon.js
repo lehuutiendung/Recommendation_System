@@ -6,5 +6,7 @@ export default {
     SuggestForYou: "Gợi ý cho bạn",
     Visit: "Ghé thăm",
     Online: "Trực tuyến",
-    NoMatch: "Không có kết quả cho "
+    NoMatch: "Không có kết quả cho ",
+    GroupJoined: "Nhóm đã tham gia",
+    NotFoundPost: "Bài viết này hiện không khả dụng"
 }

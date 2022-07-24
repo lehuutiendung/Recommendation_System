@@ -23,7 +23,12 @@
                     </div>
                     <div class="item">  
                         <div class="label-item">Giới tính</div>
-                        <Input :stateView="stateView" v-model="userData.genderName"/>
+                        <Input :stateView="stateView" v-model="userData.genderName" v-if="stateView"/>
+                        <div class="flex gender-radio" v-else>
+                            <Radio nameRadio="Nam" @radio="getRadio" :indexRadio="indexRadio" :index="0"/>
+                            <Radio nameRadio="Nữ" @radio="getRadio" :indexRadio="indexRadio" :index="1"/>
+                            <Radio nameRadio="Khác" @radio="getRadio" :indexRadio="indexRadio" :index="2"/>
+                        </div>
                     </div>
                     <div class="item">  
                         <div class="label-item">Tôn Giáo</div>
@@ -43,7 +48,7 @@
                     </div>
                 </div>
                 <!-- Thông tin liên hệ -->
-                <div class="title">{{ $t('i18nPersonal.TabAbout.ContactInformation') }}</div>
+                <div class="title m-t-10">{{ $t('i18nPersonal.TabAbout.ContactInformation') }}</div>
                 <div class="w-50-per">
                     <div class="item">  
                         <div class="label-item">Email</div>
@@ -54,29 +59,20 @@
                         <Input :stateView="stateView" v-model="userData.phoneNumber"/>
                     </div>
                 </div>
-                <!-- Công việc và học vấn
-                <div class="title">{{ $t('i18nPersonal.TabAbout.WorkInformation') }}</div>
+                <!-- Công việc và học vấn -->
+                <div class="title m-t-10">{{ $t('i18nPersonal.TabAbout.Others') }}</div>
                 <div class="w-50-per">
                     <div class="item">  
-                        <div class="label-item">Công việc</div>
-                        <Input :stateView="stateView"/>
+                        <div class="label-item">Trích dẫn</div>
+                        <Input class="custom-quotes" :stateView="stateView" v-model="userData.quotes"/>
                     </div>
-                    <div></div>
-                    <div class="item">  
-                        <div class="label-item">Đại học/Cao đẳng</div>
-                        <Input :stateView="stateView"/>
-                    </div>
-                    <div></div>
-                    <div class="item">  
-                        <div class="label-item">Trường trung học</div>
-                        <Input :stateView="stateView"/>
-                    </div>
-                </div> -->
+                </div>
             </div>
         </div>
     </div>
 </template>
 <script>
+import Radio from "@/components/input-radio/BaseRadio.vue"
 import Input from "@/components/input/BaseInput.vue";
 import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import UserAPI from "@/api/UserAPI.js"
@@ -87,13 +83,15 @@ export default {
     name: 'TabAboutPersonal',
     components:{
         Input,
-        ButtonIcon
+        ButtonIcon,
+        Radio
     },
     data() {
         return {
             stateView: true,
             userData: {},
             isOwnerAcc: false,
+            indexRadio: 0,
         }
     },
     created() {
@@ -108,10 +106,13 @@ export default {
             // Chuyển đổi enum => loại giới tính
             if(this.userData.gender == 0){
                 this.userData.genderName = "Nam";
+                this.indexRadio = 0;
             }else if(this.userData.gender == 1){
                 this.userData.genderName = "Nữ";
+                this.indexRadio = 1;
             }else{
                 this.userData.genderName = "Khác";
+                this.indexRadio = 2;
             }
             // Chuyển đổi ngày tháng DD/MM/YYYY
             this.userData.dateOfBirthConverted = this.convertDateVN(this.userData.dateOfBirth);
@@ -120,19 +121,28 @@ export default {
         }   
     },
     methods: {
+        /**
+         * v-model gender
+         */
+        getRadio(value){ 
+            this.$set(this.userData, "gender", value);
+            this.indexRadio = value;
+        },
         //Call API lấy thông tin của người dùng
         getUserData(){
             UserAPI.getByID(this.$route.params.id).then( (res) => {
                 if(res && res.data.Success){
                     this.userData = res.data.doc;
-                    this.$store.dispatch('updateUserInfor', res.data.doc);
                     // Chuyển đổi enum => loại giới tính
                     if(this.userData.gender == 0){
                         this.userData.genderName = "Nam";
+                        this.indexRadio = 0;
                     }else if(this.userData.gender == 1){
                         this.userData.genderName = "Nữ";
+                        this.indexRadio = 1;
                     }else{
                         this.userData.genderName = "Khác";
+                        this.indexRadio = 2;
                     }
                     // Chuyển đổi ngày tháng DD/MM/YYYY
                     this.userData.dateOfBirthConverted = this.convertDateVN(this.userData.dateOfBirth);
@@ -159,11 +169,11 @@ export default {
                 hometown: this.userData.hometown,
                 ethnic: this.userData.ethnic,
                 religion: this.userData.religion,
-                nationality: this.userData.nationality
+                nationality: this.userData.nationality,
+                quotes: this.userData.quotes
             }
             UserAPI.update(this.$route.params.id, newDataUser).then( async () => {
                 this.stateView = true;
-                // TODO: Bất đồng bộ dispatch trước khi gọi update userName HeaderApp
                 this.getUserData();
                 EventBus.$emit('updateInfor', true);
             })
@@ -216,6 +226,7 @@ export default {
             .grid-2-col{
                 display: grid;
                 grid-column-gap: 10%;
+                grid-row-gap: 6px;
                 grid-template-columns: 45% 45%;
                 padding: 10px 30px;
                 
@@ -224,6 +235,12 @@ export default {
                 display: grid;
                 grid-column-gap: 10%;
                 grid-template-columns: 45% 45%;
+                padding: 10px 30px;
+            }
+            .w-100-per{
+                display: grid;
+                grid-column-gap: 10%;
+                grid-template-columns: 100%;
                 padding: 10px 30px;
             }
         }
@@ -235,6 +252,17 @@ export default {
             width: 6vw;
             margin-right: 8px;
         }
+        .gender-radio{
+            margin-left: -8px;
+            margin-top: 4px;
+        }
     }
+}    
+</style>
+<style lang="scss">
+.custom-quotes .wrap-input-view{
+    border-bottom: none;
+    white-space: break-spaces;
+    text-align: justify;
 }    
 </style>

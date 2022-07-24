@@ -279,6 +279,7 @@ export default {
   cursor: pointer;
 }
 .overview-group .rightbar-group {
+  display: none;
   width: var(--sidebarRight-width);
   border-radius: 8px;
   height: 50vh;

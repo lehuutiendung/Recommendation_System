@@ -6,6 +6,13 @@ class GroupAPI extends BaseAPI {
         super();
         this.controller = "groups";
     }
+    /**
+     * Lấy dữ liệu chi tiết của nhóm
+     * @param {*} data 
+     */
+    getByID(data){
+        return BaseAPIConfig.post(`${this.controller}/group-detail`, data);
+    }
 
     /**
      * Tham gia hội nhóm

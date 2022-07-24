@@ -6,7 +6,7 @@
                 <div class="title">{{ $t('i18nPersonal.TabTimeline.About' )}}</div>
                 <div class="line">
                     <div class="icon-20 icon-quotes"></div>
-                    <div class="m-l-10">Trích dẫn ý nghĩa: {{ dataUser.quotes }}</div>
+                    <div class="m-l-10 quotes">Trích dẫn ý nghĩa: {{ dataUser.quotes }}</div>
                 </div>
                 <div class="line">
                     <div class="icon-20 icon-live"></div>
@@ -622,5 +622,9 @@ export default {
     background-size: contain;
     -webkit-filter: var(--filter-placeholder-icon);
 
+}
+.quotes{
+    text-align: justify;
+    padding-right: 8px;
 }
 </style>

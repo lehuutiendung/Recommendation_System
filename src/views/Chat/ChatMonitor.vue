@@ -68,6 +68,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="typing-chat" v-if="dataTyping.typing && (dataTyping.toUserID == fromUserID)">{{ dataTyping.fromUserName }} đang soạn tin nhắn</div>
                         </div>
                         <div class="footer-box">
                             <div class="comment" 
@@ -114,7 +115,9 @@ export default {
                     cloudinaryID: ""
                 }
             },
-            isViewChatMonitor: false,       //Tại màn chat lớn ChatMonitor hay không (giải quyết vấn đề nhận tin nhắn mới, tự động scroll bottom)
+            isViewChatMonitor: false,       //Tại màn chat lớn ChatMonitor hay không (giải quyết vấn đề nhận tin nhắn mới, tự động scroll bottom),
+            dataTyping: {},          //Đang gõ tin nhắn hay không,
+            ownerName: null,        //Tên người dùng tài khoản
         }
     },
     async created() {
@@ -122,6 +125,7 @@ export default {
         await this.statusFriends();
         let userInfor = this.$store.getters.userInfor;
         this.fromUserID = userInfor._id;
+        this.ownerName = userInfor.userName;
         if(this.lstFriends.length > 0){
             this.toUserID = this.lstFriends[0]._id;
             this.dataFriend = this.lstFriends[0];
@@ -142,6 +146,10 @@ export default {
         setTimeout(() => {
             framechatBody.scrollTo(0, document.body.scrollHeight + 100)
         }, 100);
+
+        this.$socket.on("typing", (data) => {
+            this.dataTyping = data;
+        })
 
         //Nhận message từ socket server
         this.$socket.on("receive-message", (message) => {
@@ -294,6 +302,21 @@ export default {
         textMessage: function(){
             if(this.textMessage == ""){
                 this.$refs.messagechat.innerText = this.textMessage;
+                let data = {
+                    fromUserID: this.fromUserID,
+                    fromUserName: this.ownerName,
+                    toUserID: this.toUserID,
+                    typing: false
+                }
+                this.$socket.emit("stopTyping", data)
+            }else{
+                let data = {
+                    fromUserID: this.fromUserID,
+                    fromUserName: this.ownerName,
+                    toUserID: this.toUserID,
+                    typing: true
+                }
+                this.$socket.emit("typing", data);
             }
         },
     },
@@ -431,6 +454,16 @@ export default {
         opacity: 0;
         cursor: pointer;
     }
+}
+.typing-chat{
+    position: sticky;
+    width: 100%;
+    bottom: 0px;
+    display: flex;
+    padding-left: 18px;
+    padding-bottom: 4px;
+    padding-top: 4px;
+    background-color: #ffffff;
 }
 .preview-image{
     position: sticky;

@@ -80,6 +80,7 @@ import Overview from "@/views/Overview/Overview.vue"
 import UserAPI from "@/api/UserAPI.js"
 import ButtonIcon from "@/components/button-icon/ButtonIcon.vue"
 import {Notification} from "@/models/enums/Notification.js"
+import {RequestEnum} from "@/models/enums/Request.js"
 import ClickOutSide from "@/mixins/detectoutside.js"
 const InputFile = () => import("@/components/input-file/InputFile.vue")
 import {EventBus} from "../../main";
@@ -210,17 +211,22 @@ export default {
         requestAddFriend(){
             let dataMongo = {
                 userRequestID: this.$cookie.get('u_id'),
-                userRecipientID: this.$route.params.id
+                userRecipientID: this.$route.params.id,
+                typeNoti: Notification.FRIEND,
+                status: RequestEnum.REQUESTED,
+                postID: null
             }
-            UserAPI.createdRequestAddFriend(dataMongo).then((res)=>{
-                const dataRes = res.data.data.doc;
-                let dataSocket = {
-                    id: dataRes._id,
-                    userRequestID: dataRes.userRequestID,
-                    userRecipientID: dataRes.userRecipientID,
-                    typeNotification: Notification.FRIEND 
+            UserAPI.saveRequestNoti(dataMongo).then((res)=>{
+                if(res.data && res.data.success){
+                    const dataRes = res.data.data.doc;
+                    let dataSocket = {
+                        id: dataRes._id,
+                        userRequestID: dataRes.userRequestID,
+                        userRecipientID: dataRes.userRecipientID,
+                        typeNoti: Notification.FRIEND 
+                    }
+                    this.$socket.emit('send_notification', dataSocket);
                 }
-                this.$socket.emit('send_notification', dataSocket);
             })
         },
         /**
@@ -305,7 +311,10 @@ export default {
     watch:{
         // Cập nhật thông tin khi thay đổi trang cá nhân 
         '$route.params.id': {
-            handler: function(userIDCurrent) {
+            handler: function(userIDCurrent, newVal) {
+                if(userIDCurrent != newVal){
+                    this.currentTab = 0;
+                }
                 if(userIDCurrent){
                     this.getInfoUser();
                 }

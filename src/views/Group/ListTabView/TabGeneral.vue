@@ -50,7 +50,11 @@ export default {
         }
     },
     created() {
-        GroupAPI.getByID(this.$route.params.id).then((res) => {
+        let param = {
+            groupID: this.$route.params.id,
+            userID: this.$cookie.get("u_id")
+        }
+        GroupAPI.getByID(param).then((res) => {
             if(res.data && res.data.success){
                 this.dataGroup = res.data.doc;
                 this.adminGroup = this.dataGroup.admin;

@@ -68,4 +68,5 @@
     background-size: contain;
     width: 20px;
 	height: 20px;
+    -webkit-filter: invert(59%) sepia(171%) saturate(400%) saturate(100%) hue-rotate(176deg) brightness(90%) contrast(94%);
 }
