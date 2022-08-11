@@ -17,6 +17,8 @@
                 <ItemMember
                 :member="member"
                 :admin="admin"
+                :dataGroup="dataGroup"
+                @afterDeleteMember="afterDeleteMember"
                 >
                 </ItemMember>
             </div>
@@ -78,6 +80,10 @@ export default {
                 }
             })
         },
+        //Loại bỏ nhân viên trong list sau khi xóa
+        afterDeleteMember(memberID){
+            this.lstMembers = this.lstMembers.filter(x => x._id != memberID);
+        }
     },
 }
 </script>

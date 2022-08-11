@@ -516,6 +516,7 @@ export default {
             font-size: 20px;
             font-weight: 450;
             text-align: center;
+            white-space: nowrap;
         }
     }
 }

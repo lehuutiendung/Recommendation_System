@@ -15,12 +15,13 @@
             <div class="icon-16 icon-three-dots"></div>
         </div>
         <div class="popup-option" v-if="isShowOption">
-            <div class="item-option item-delete">Xóa thành viên</div>
+            <div class="item-option item-delete" @click="deleteMember(member._id)">Xóa thành viên</div>
         </div>
     </div>
 </template>
 <script>
 import ClickOutSide from "@/mixins/detectoutside.js"
+import GroupAPI from "@/api/GroupAPI.js"
 export default {
     name: 'ItemMember',
     directives: {
@@ -38,6 +39,12 @@ export default {
             }
         },
         admin:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        dataGroup:{
             type: Object,
             default(){
                 return {}
@@ -64,6 +71,18 @@ export default {
         hidePopupOption(){
             this.isShowOption = false;
         },
+        //Xóa thành viên
+        deleteMember(memberID){
+            let dataRequest = {
+                groupID: this.dataGroup._id,
+                userID: memberID
+            }
+            GroupAPI.outGroup(dataRequest).then(res => {
+                if(res.data && res.data.success){
+                    this.$emit("afterDeleteMember", memberID);
+                }
+            });
+        }
     },
 }
 </script>

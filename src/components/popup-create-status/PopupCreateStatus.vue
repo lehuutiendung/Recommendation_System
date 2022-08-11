@@ -176,7 +176,6 @@ export default {
          */
         onFileChange(e) {
             let lstFiles = e.target.files;
-            console.log(e.target.files);
             let arrayImages = [...lstFiles].filter(x => x.type.includes('image'));
             let arrayVideos = [...lstFiles].filter(x => x.type.includes('video'));
             // Lưu vào mảng images dùng làm data call api

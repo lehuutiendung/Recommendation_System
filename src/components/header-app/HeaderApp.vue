@@ -76,6 +76,10 @@
                     </div>
                 </div>
             </div>
+            <!-- Setting -->
+            <div class="icon-40 button-icon" @click="redirectToSetting">
+                <div class="icon-20 icon-setting"></div>
+            </div>
             <!-- Đăng xuất -->
             <div class="icon-40 button-icon" @click="handleLogOut">
                 <div class="icon-20 icon-log-out"></div>
@@ -192,6 +196,12 @@ export default {
             } catch (error) {
                 console.log(error);
             }
+        },
+        //Chuyển hướng đến thiết lập
+        redirectToSetting(){
+            this.$router.push({
+                name: 'Setting',
+            }).catch(()=>{});
         },
         // Chuyển hướng đến trang tin nhắn
         redirectToChat(){
