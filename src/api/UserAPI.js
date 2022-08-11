@@ -94,6 +94,15 @@ class UserAPI extends BaseAPI{
     updateStatusNoti(data){
         return BaseAPIConfig.post(`${this.controller}/update-status-notification`, data);
     }
+
+    /**
+     * Thiết lập - thay đổi mật khẩu
+     * @param {*} data 
+     * @returns 
+     */
+    changePasswordSetting(data){
+        return BaseAPIConfig.post(`${this.controller}/change-password-setting`, data);
+    }
     
 }
 export default new UserAPI();

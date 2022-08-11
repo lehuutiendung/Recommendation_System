@@ -283,7 +283,7 @@ export default {
         clickSave(){
             let formData = new FormData();
             this.$eventBus.$emit('loading', true);
-            if(this.previewAvatar != ""){
+            if(this.typeChangeImage == 0){
                 formData.append("avatar", this.file);
                 UserAPI.changeAvatar(this.ownerID, formData).then( res => {
                     if(res.data && res.data.success){

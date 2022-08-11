@@ -137,6 +137,14 @@ let router = new VueRouter({
                 requiresAuth: true
             },
         },
+        {
+            path: '/setting',
+            name: 'Setting',
+            component: () => import('@/views/Setting/ChangePassword.vue'),
+            meta: {
+                requiresAuth: true
+            },
+        },
     ]
 })
 

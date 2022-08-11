@@ -129,19 +129,23 @@ export default {
   methods: {
     // Tìm kiếm nhóm
     handleSearch(){
-      if(this.inputSearch != ''){
-        let dataReq = {
-          name: this.searchValue,
-          pageIndex: this.pageIndex,
-          pageSize: this.pageSize,
-          userID: this.$cookie.get("u_id"),
-        };
-        GroupAPI.getPaging(dataReq).then((res) => {
-          this.totalPage = res.data.data.totalPage;
-          //Push thêm data vào listGroup
-          this.listGroup = res.data.data.doc;
-        });
+      let setPageIndex = 1;
+      if(this.searchValue != ''){
+        setPageIndex = -1;
+      }else{
+        this.pageIndex = 1;
       }
+      let dataReq = {
+        name: this.searchValue,
+        pageIndex: setPageIndex,
+        pageSize: this.pageSize,
+        userID: this.$cookie.get("u_id"),
+      };
+      GroupAPI.getPaging(dataReq).then((res) => {
+        this.totalPage = res.data.data.totalPage;
+        //Push thêm data vào listGroup
+        this.listGroup = res.data.data.doc;
+      });
     },
     /**
      * Phân trang
