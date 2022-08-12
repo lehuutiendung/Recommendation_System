@@ -133,10 +133,20 @@
                 <div class="grid-picture">
                     <div class="grid-item" v-for="(picture, index) in historyImage" :key="index">
                         <div class="picture">
-                            <cld-image 
+                            <!-- <cld-image 
                                 :publicId="picture.cloudinaryID" loading="lazy" @click.native="viewFullImage(picture.cloudinaryID)">
                                 <cld-transformation gravity="south" crop="fill"/>
+                            </cld-image> -->
+                            <cld-image 
+                                v-if="picture.resourceType == 'image'"
+                                :publicId="picture.cloudinaryID" 
+                                loading="lazy" @click.native="viewFullImage(picture.cloudinaryID)">
+                                <cld-transformation gravity="south" crop="fill"/>
                             </cld-image>
+                            <cld-video 
+                                v-if="picture.resourceType == 'video'"
+                                :publicId="picture.cloudinaryID" controls="true">
+                            </cld-video>
                         </div>
                     </div>
                 </div>
@@ -213,7 +223,7 @@ export default {
         this.groupID = this.$route.params.id;
         this.ownerID = userInfor._id;
         this.getPagingImage();
-
+        console.log(this.historyImage);
         //Lắng nghe sự kiện refresh trang
         this.$eventBus.$on('refresh', ()=>{
             this.listDataPost = [];
@@ -253,11 +263,13 @@ export default {
                 //Tạo 1 mảng chứa các object image { postID, cloudinaryID }
                 let resDoc = res.data.doc;
                 resDoc.forEach(element => {
-                   let imageIDs = element.image.map(x => x.cloudinaryID);
+                //    let imageIDs = element.image.map(x => x.cloudinaryID);
+                let imageIDs = element.image;
                    imageIDs.forEach(imageID => {
                         let dataImage = {
                             postID: element._id,
-                            cloudinaryID: imageID
+                            cloudinaryID: imageID.cloudinaryID,
+                            resourceType: imageID.resourceType
                         }
                         this.historyImage.push(dataImage);
                    });
@@ -547,6 +559,12 @@ export default {
                         width: 100%;
                         height: 100%;
                         img{
+                            border-radius: 4px;
+                            width: 100%;
+                            height: 100%;
+                            object-fit: cover;
+                        }
+                        video{
                             border-radius: 4px;
                             width: 100%;
                             height: 100%;

@@ -46,7 +46,7 @@
                     </div>
                 </div>
                 <div class="button-accept">
-                    <ButtonText text="Chia sẻ" :disable="disableButton && (previewImages.length == 0)" @click.native="createPost"/>
+                    <ButtonText text="Chia sẻ" :disable="disableButton && (images.length == 0)" @click.native="createPost"/>
                 </div>
             </div>
             <Loader v-if="isShowLoader"/>
@@ -176,10 +176,13 @@ export default {
          */
         onFileChange(e) {
             let lstFiles = e.target.files;
+            lstFiles.forEach(element => {
+                this.images.push(element);
+            });
             let arrayImages = [...lstFiles].filter(x => x.type.includes('image'));
             let arrayVideos = [...lstFiles].filter(x => x.type.includes('video'));
             // Lưu vào mảng images dùng làm data call api
-            this.images = e.target.files;
+            // this.images = e.target.files;
             if(arrayImages.length > 0){
                 this.handlePreviewImage(arrayImages);
             }

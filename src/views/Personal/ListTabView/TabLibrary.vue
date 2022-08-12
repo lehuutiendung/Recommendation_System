@@ -22,10 +22,15 @@
                         </div> -->
                         <div class="card" v-for="(item, index) in listPostImage" :key="index">
                             <cld-image 
+                                v-if="item.resourceType == 'image'"
                                 :publicId="item.cloudinaryID" 
                                 loading="lazy" @click.native="viewFullImage(item.cloudinaryID)">
                                 <cld-transformation width="auto" gravity="south" crop="fill"/>
                             </cld-image>
+                            <cld-video 
+                                v-if="item.resourceType == 'video'"
+                                :publicId="item.cloudinaryID" controls="true">
+                            </cld-video>
                         </div>
                     </div>
                     <Observer @getPaging="scrollPaging"/>
@@ -74,11 +79,12 @@ export default {
                 //Tạo 1 mảng chứa các object image { postID, cloudinaryID }
                 let resDoc = res.data.doc;
                 resDoc.forEach(element => {
-                   let imageIDs = element.image.map(x => x.cloudinaryID);
+                   let imageIDs = element.image;
                    imageIDs.forEach(imageID => {
                         let dataImage = {
                             postID: element._id,
-                            cloudinaryID: imageID
+                            cloudinaryID: imageID.cloudinaryID,
+                            resourceType: imageID.resourceType
                         }
                         this.listPostImage.push(dataImage);
                    });
@@ -176,6 +182,12 @@ export default {
                 height: 100%;
                 object-fit: cover;
                 cursor: pointer;
+            }
+            video{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                cursor: pointer; 
             }
         }
 
